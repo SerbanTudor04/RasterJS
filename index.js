@@ -166,6 +166,44 @@ class Rectangle extends Drawable{
    
 }
 
+class ContextMenuItem{
+    context_menu=null;
+    name = null;
+    id=null;
+    formated_name=null;
+    element=null;
+    hiddeable=false;
+    callback=null;
+    constructor(_context_menu,_name,_hiddeable,_callback){
+        this.context_menu =_context_menu
+        this.name=_name
+        this.id=`menu-${this.name}`
+        this.formated_name=String(this.name).toLocaleUpperCase().replace(" ","-")
+        this.hiddeable=_hiddeable
+        this.callback=_callback
+        this.build();
+    }
+
+    build(){
+        this.element=document.createElement('li')
+        this.element.id=this.id
+        this.element.text=this.name
+
+        document.getElementById('menu-delete').addEventListener('click',this.callback)
+    }
+
+    hide(){
+        if(!this.hiddeable)return
+        this.element.style.display='none'
+    }
+
+    show(){
+        this.element.style.display='block'
+
+    }
+    
+
+}
 
 class ContextMenu{
 
