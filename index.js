@@ -258,12 +258,15 @@ class ContextMenu{
 
 
     deleteDrawable(drawableToDelete) {
-       
-        this.drawables = this.drawables.filter(d => d !== drawableToDelete);
 
-       
-        if (this.dragTarget === drawableToDelete) {
-            this.dragTarget = null;
+        const index = this.drawables.indexOf(drawableToDelete);
+
+        if (index > -1) {
+            this.drawables.splice(index, 1);
+        }
+
+        if (program.dragTarget === drawableToDelete) {
+            program.dragTarget = null;
         }
         if (this.rightClickedTarget === drawableToDelete) {
             this.rightClickedTarget = null;
@@ -271,15 +274,19 @@ class ContextMenu{
     }
 
     bringToFront(drawableToMove) {
-        
-        this.drawables = this.drawables.filter(d => d !== drawableToMove);
+        const index = this.drawables.indexOf(drawableToMove);
+        if (index > -1) {
+            this.drawables.splice(index, 1);
+        }
         
         this.drawables.push(drawableToMove);
     }
 
     sendToBack(drawableToMove) {
-        
-        this.drawables = this.drawables.filter(d => d !== drawableToMove);
+        const index = this.drawables.indexOf(drawableToMove);
+        if (index > -1) {
+            this.drawables.splice(index, 1);
+        }
         
         this.drawables.unshift(drawableToMove);
     }
@@ -362,7 +369,7 @@ class Program{
     lastMouseY=0;
 
     mouseMovedSinceDown=false;
-    clickThreshold=3;
+    clickThreshold=1;
 
     context_menu=null;
 
@@ -375,8 +382,6 @@ class Program{
         this.canvas.setSize(pageSize.width, pageSize.height);
         this.canvas.clear();
         this.canvas.initMouseListeners();
-
-
 
 
         let rect1 = new Rectangle(100, 100, 'red');
@@ -537,7 +542,7 @@ class Program{
     updateCursor(mouseX, mouseY){
         let cursor = 'default'
 
-        if(!this.isDragging)return;
+        if(this.isDragging)return;
         for(let i = this.drawables.length-1;i>=0;i--){
 
             if(this.drawables[i]!==this.dragTarget &&
