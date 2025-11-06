@@ -285,9 +285,7 @@ class Program{
             return;
         }
 
-
-
-        
+        this.updateMouseUp(mouseX,mouseY)
 
     }
 
@@ -305,12 +303,13 @@ class Program{
     }
 
     updateMouseDown(mouseX, mouseY){
+        let deltaX = mouseX -  this.lastMouseX;
+        let deltaY = mouseY -  this.lastMouseY;
         if(this.isDragging){
-            let deltaX = mouseX -  this.lastMouseX;
-            let deltaY = mouseY -  this.lastMouseY;
-            this.mouseMovedSinceDown = (Math.abs(deltaX) > this.clickThreshold || Math.abs(deltaY) > this.clickThreshold);
 
-            if(this.dragTarget)
+            this.mouseMovedSinceDown = !this.mouseMovedSinceDown && (Math.abs(deltaX) > this.clickThreshold || Math.abs(deltaY) > this.clickThreshold);
+
+            if(this.dragTarget && this.mouseMovedSinceDown)
                 this.handleDrag(deltaX, deltaY);
 
 
@@ -323,7 +322,8 @@ class Program{
         this.lastMouseX = mouseX;
         this.lastMouseY = mouseY;
         this.mouseMovedSinceDown = false;
-
+        
+        let foundTarget =false;
         for(let i = this.drawables.length -1; i >=0 ; i--){
             let drawable = this.drawables[i];
             let handle = drawable.getHandleAtPoint(mouseX, mouseY);
@@ -331,8 +331,14 @@ class Program{
 
             this.dragTarget = drawable;
             this.resizeHandle = handle;
+            foundTarget=true;
             break;
         }
+
+        if(foundTarget)return;
+
+        this.dragTarget=null
+        this.resizeHandle=null
 
 
     }
@@ -401,7 +407,14 @@ class Program{
 
     updateCursor(mouseX, mouseY){
         let cursor = 'default'
+
+        if(!this.isDragging)return;
         for(let i = this.drawables.length-1;i>=0;i--){
+
+            if(this.drawables[i]!==this.dragTarget &&
+                this.dragTarget!==null
+            )continue;
+
             let handle = this.drawables[i].getHandleAtPoint(mouseX,mouseY);
             if(!handle)continue;
             switch (handle) {
@@ -428,7 +441,7 @@ class Program{
             break;
 
         }
-        this.canvas.style.cursor=cursor
+        this.canvas.canvas.style.cursor=cursor
     }
 
 
