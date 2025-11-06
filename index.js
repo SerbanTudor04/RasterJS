@@ -187,9 +187,8 @@ class ContextMenuItem{
     build(){
         this.element=document.createElement('li')
         this.element.id=this.id
-        this.element.text=this.name
-
-        document.getElementById('menu-delete').addEventListener('click',this.callback)
+        this.element.textContent=this.name
+        this.element.addEventListener('click',this.callback)
     }
 
     hide(){
@@ -210,7 +209,7 @@ class ContextMenu{
     context_menu_div =null
     canvas=null
     drawables=null
-
+    items=[]
     rightClickedTarget=null;
     constructor(_canvas,_drawables){
         this.canvas=_canvas;
@@ -226,15 +225,51 @@ class ContextMenu{
         this.context_menu_div.classList.add("context-menu")
         this.context_menu_div.id = "custom-context-menu"
 
-        this.context_menu_div.innerHTML =`
-        <ul>
-            <li id="menu-bring-front">Bring to Front</li>
-            <li id="menu-send-back">Send to Back</li>
-            <li class="separator"></li>
-            <li id="menu-delete" style="color: red;">Delete</li>
-        </ul>
-        `
-        
+        const ul = document.createElement("ul");
+    
+        this.items.push(new ContextMenuItem(
+            this,
+            'Bring to Front',
+            false,
+            () => {
+                if (this.rightClickedTarget) {
+                    this.bringToFront(this.rightClickedTarget);
+                }
+            }
+        ));
+
+        this.items.push(new ContextMenuItem(
+            this,
+            'Send to Back',
+            false,
+            () => {
+                if (this.rightClickedTarget) {
+                    this.sendToBack(this.rightClickedTarget);
+                }
+            }
+        ));
+
+        this.items.push(new ContextMenuItem(
+            this,
+            'Delete',
+            false,
+            () => {
+                if (this.rightClickedTarget) {
+                    this.deleteDrawable(this.rightClickedTarget);
+                }
+            }
+        ));
+
+        const separator = document.createElement('li');
+        separator.className = 'separator';
+
+        ul.appendChild(this.items[0].element);
+        ul.appendChild(this.items[1].element);
+        ul.appendChild(separator);
+        const deleteItem = this.items[2];
+        deleteItem.element.style.color = 'red';
+        ul.appendChild(deleteItem.element);
+        this.context_menu_div.appendChild(ul);
         document.body.appendChild(this.context_menu_div)
     }
 
@@ -273,24 +308,6 @@ class ContextMenu{
 
         })
 
-        document.getElementById('menu-delete')
-        .addEventListener('click',()=>{
-            if(!this.rightClickedTarget)return;
-            this.deleteDrawable(this.rightClickedTarget)
-
-        })
-        document.getElementById('menu-bring-front')
-        .addEventListener('click',()=>{
-            if(!this.rightClickedTarget)return;
-            this.bringToFront(this.rightClickedTarget)
-
-        })
-        document.getElementById('menu-send-back')
-        .addEventListener('click',()=>{
-            if(!this.rightClickedTarget)return;
-            this.sendToBack(this.rightClickedTarget)
-
-        })
 
     }
 
