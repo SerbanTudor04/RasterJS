@@ -167,6 +167,125 @@ class Rectangle extends Drawable{
 }
 
 
+class ContextMenu{
+
+    context_menu_div =null
+    canvas=null
+    drawables=null
+
+    rightClickedTarget=null;
+    constructor(_canvas,_drawables){
+        this.canvas=_canvas;
+        this.drawables=_drawables;
+
+    }
+
+    
+
+    build(){
+
+        this.context_menu_div = document.createElement("div")
+        this.context_menu_div.classList.add("context-menu")
+        this.context_menu_div.id = "custom-context-menu"
+
+        this.context_menu_div.innerHTML =`
+        <ul>
+            <li id="menu-bring-front">Bring to Front</li>
+            <li id="menu-send-back">Send to Back</li>
+            <li class="separator"></li>
+            <li id="menu-delete" style="color: red;">Delete</li>
+        </ul>
+        `
+        
+        document.body.appendChild(this.context_menu_div)
+    }
+
+    initListeners(){
+        this.canvas.canvas.addEventListener("contextmenu", (e)=>{
+            e.preventDefault();
+
+            let mouseX= this.canvas.mouseX;
+            let mouseY= this.canvas.mouseY;
+            this.rightClickedTarget=null;
+
+            for(let i =this.drawables.length -1 ;i>=0;i--){
+                if(!this.drawables[i].isPointInside(mouseX,mouseY))
+                    continue;
+
+                this.rightClickedTarget=this.drawables[i];
+                break;
+            }
+
+            if(!this.rightClickedTarget){
+                this.context_menu_div.style.display='none'
+                return
+            }
+
+            this.context_menu_div.style.left = `${e.clientX}px`
+            this.context_menu_div.style.top = `${e.clientY}px`
+            this.context_menu_div.style.display =`block`
+
+            console.log(`Right-clicked on ${this.rightClickedTarget.color} rectangle`);
+
+        })
+
+
+        window.addEventListener('click',(e)=>{
+            this.context_menu_div.style.display='none'
+
+        })
+
+        document.getElementById('menu-delete')
+        .addEventListener('click',()=>{
+            if(!this.rightClickedTarget)return;
+            this.deleteDrawable(this.rightClickedTarget)
+
+        })
+        document.getElementById('menu-bring-front')
+        .addEventListener('click',()=>{
+            if(!this.rightClickedTarget)return;
+            this.bringToFront(this.rightClickedTarget)
+
+        })
+        document.getElementById('menu-send-back')
+        .addEventListener('click',()=>{
+            if(!this.rightClickedTarget)return;
+            this.sendToBack(this.rightClickedTarget)
+
+        })
+
+    }
+
+
+    deleteDrawable(drawableToDelete) {
+       
+        this.drawables = this.drawables.filter(d => d !== drawableToDelete);
+
+       
+        if (this.dragTarget === drawableToDelete) {
+            this.dragTarget = null;
+        }
+        if (this.rightClickedTarget === drawableToDelete) {
+            this.rightClickedTarget = null;
+        }
+    }
+
+    bringToFront(drawableToMove) {
+        
+        this.drawables = this.drawables.filter(d => d !== drawableToMove);
+        
+        this.drawables.push(drawableToMove);
+    }
+
+    sendToBack(drawableToMove) {
+        
+        this.drawables = this.drawables.filter(d => d !== drawableToMove);
+        
+        this.drawables.unshift(drawableToMove);
+    }
+
+}
+
 
 class Canvas{
     isMouseDown = false;
@@ -245,7 +364,10 @@ class Program{
     mouseMovedSinceDown=false;
     clickThreshold=3;
 
+    context_menu=null;
+
     constructor(){
+
         this.canvas = new Canvas('main-canvas');
 
         let pageSize = getPageSize();
@@ -255,6 +377,8 @@ class Program{
         this.canvas.initMouseListeners();
 
 
+
+
         let rect1 = new Rectangle(100, 100, 'red');
         rect1.setPosition(150, 150);
         this.drawables.push(rect1);
@@ -262,6 +386,11 @@ class Program{
         let rect2 = new Rectangle(150, 80, 'blue');
         rect2.setPosition(400, 300);
         this.drawables.push(rect2);
+
+        this.context_menu= new ContextMenu(this.canvas,this.drawables);
+        this.context_menu.build();
+        this.context_menu.initListeners();
+
     }
 
 

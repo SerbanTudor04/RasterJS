@@ -8,3 +8,39 @@ body,html{
     background-color:#f0f0f0;
     display:block;
 }
+
+.context-menu {
+    display: none; /* Hidden by default */
+    position: absolute; /* Allows us to place it at X/Y coords */
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 150px;
+    font-family: sans-serif;
+    border-radius: 4px;
+}
+
+.context-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 5px 0;
+}
+
+.context-menu ul li {
+    padding: 8px 16px;
+    cursor: pointer; /* Show a hand pointer */
+    font-size: 14px;
+}
+
+.context-menu ul li:hover {
+    background-color: #e0e0e0;
+}
+
+/* A simple separator line */
+.context-menu .separator {
+    height: 1px;
+    background-color: #ccc;
+    margin: 5px 0;
+    padding: 0;
+}
