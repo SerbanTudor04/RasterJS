@@ -643,20 +643,6 @@ class Canvas{
 
 }
 
-function getPageSize(){
-    let body = document.body,
-        html = document.documentElement;
-
-    let width = Math.max( body.scrollWidth, body.offsetWidth, 
-                           html.clientWidth, html.scrollWidth, html.offsetWidth );
-
-    let height = Math.max( body.scrollHeight, body.offsetHeight, 
-                            html.clientHeight, html.scrollHeight, html.offsetHeight );
-
-    return { width: width, height: height };
-}
-
-
 
 class Program{
 
