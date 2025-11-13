@@ -499,6 +499,9 @@ class Program{
     ribbon = null;
     activeTool='select';
 
+    dragStartX=0;
+    dragStartY=0;
+
     constructor(){
 
         this.canvas = new Canvas('main-canvas');
@@ -622,13 +625,18 @@ class Program{
             }
         }else if(this.activeTool==='rectangle'){
             this.dragTarget = null;
+            
+            this.dragStartX = mouseX;
+            this.dragStartY = mouseY;
+
             const randomColor = "#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
             let newRect = new Rectangle(0,0,randomColor);
-            newRect.setPosition(mouseX+0.5, mouseY+0.5);
+            newRect.setPosition(mouseX, mouseY); // Set initial center to start point
+            
             this.drawables.push(newRect);
             this.dragTarget = newRect;
-            this.resizeHandle = 'bottom-right';
-            this.items.push(newRect);
+            
+            this.resizeHandle = 'draw';
         }
 
     }
@@ -640,6 +648,27 @@ class Program{
         let target = this.dragTarget
         
         switch(this.resizeHandle){
+            case 'draw':{
+                // Get the current mouse position
+                const currentX = this.lastMouseX + deltaX;
+                const currentY = this.lastMouseY + deltaY;
+
+                // Calculate width and height from the *start* corner
+                const newWidth = currentX - this.dragStartX;
+                const newHeight = currentY - this.dragStartY;
+
+                // Calculate the new center position (halfway between start and current)
+                const newCenterX = this.dragStartX + (newWidth / 2);
+                const newCenterY = this.dragStartY + (newHeight / 2);
+
+                // Update the rectangle's properties
+                // Use Math.abs() so it works even if you drag up and left
+                target.width = Math.abs(newWidth);
+                target.height = Math.abs(newHeight);
+                target.position.x = newCenterX;
+                target.position.y = newCenterY;
+                break;
+            }
             case 'body':
                 target.position.x+=deltaX
                 target.position.y+=deltaY
