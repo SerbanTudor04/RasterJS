@@ -1,7 +1,9 @@
 
 class Statics{
-    static SELECT_ICON =`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-    <path d="M3.41 12.59l2.83 2.83c.39.39 1.02.39 1.41 0l6-6c.39-.39.39-1.02 0-1.41l-6-6c-.39-.39-1.02-.39-1.41 0l-2.83 2.83c-.39.39-.39 1.02 0 1.41L5.59 8H3c-.55 0-1 .45-1 1s.45 1 1 1h2.59l-2.18 2.18c-.39.39-.39 1.03 0 1.41z" transform="rotate(-45 12 12) translate(-2 -2)"/>
+    static SELECT_ICON =`<svg fill="#000000" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+    <g id="SVGRepo_iconCarrier"> <title>move</title> <path d="M7 23.375l3.625 3.625c0.156 0.156 0.344 0.25 0.563 0.219 0.25 0 0.469-0.063 0.625-0.219l3.594-3.625c0.5-0.5 0.344-0.875-0.375-0.875h-2.438v-5.125h5.063v2.5c0 0.719 0.438 0.844 0.938 0.344l3.594-3.594c0.156-0.156 0.219-0.344 0.219-0.594 0.031-0.219-0.063-0.438-0.219-0.625l-3.594-3.563c-0.5-0.5-0.938-0.375-0.906 0.344v2.438h-5.094v-5.063h2.438c0.719 0 0.875-0.406 0.375-0.906l-3.594-3.563c-0.313-0.313-0.875-0.344-1.188 0l-3.625 3.563c-0.5 0.5-0.344 0.906 0.375 0.906h2.438v5.031h-5.031v-2.406c0-0.719-0.438-0.844-0.938-0.344l-3.594 3.563c-0.156 0.156-0.219 0.375-0.25 0.625 0 0.25 0.094 0.438 0.25 0.594l3.594 3.594c0.5 0.5 0.906 0.375 0.906-0.344v-2.469h5.063v5.094h-2.438c-0.719 0-0.875 0.375-0.375 0.875z"></path> </g>
     </svg>`
     
     static RECT_ICON=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
@@ -19,6 +21,8 @@ class Statics{
     static PEN_ICON=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
     <path d="M20.71 5.63l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41zM3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25z"/>
     </svg>`
+
+    static CARET_DOWN_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>`;
 }
 
 class Drawable{
@@ -523,49 +527,170 @@ class ContextMenu{
 
 }
 
-
-
-class Ribbon{
+class TopMenuBar {
     element;
+    program;
 
-    toolsButtons={}
-    tools=[
-        {name:'select',icon:Statics.SELECT_ICON,title:'Select' },
-        {name:'rectangle',icon:Statics.RECT_ICON,title:'Rectangle' },
-        {name:'line',icon:Statics.LINE_ICON,title:'Line' },
-        {name:'triangle',icon:Statics.TRIANGLE_ICON,title:'Triangle' },
-        {name:'pen',icon:Statics.PEN_ICON,title:'Pen' },
-    ]
+    constructor(program) {
+        this.program = program;
+        this.element = document.createElement('nav');
+        this.element.className = 'top-menu-bar';
 
-    onToolCahnge;
+        this.element.innerHTML = `
+            <ul class="menu">
+                <li class="menu-item dropdown">
+                    <span>File</span>
+                    <ul class="dropdown-content">
+                        <li data-action="new">New</li>
+                        <li class="dropdown-separator"></li>
+                        <li class="dropdown" data-action="save">
+                            <span>Save As...</span>
+                            <ul class="dropdown-content">
+                                <li data-action="save-png">PNG Image</li>
+                                <li data-action="save-jpg">JPG Image</li>
+                                <li data-action="save-svg">SVG File</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        `;
 
-    constructor(onToolChangeCallback){
-        this.onToolCahnge=onToolChangeCallback;
+        document.body.prepend(this.element);
+        this.addListeners();
+    }
 
-        this.element= document.createElement('div');
-        this.element.id='ribbon';
+    addListeners() {
+        // Handle dropdown opening/closing
+        this.element.querySelectorAll('.menu-item.dropdown > span').forEach(span => {
+            span.addEventListener('click', (e) => {
+                let content = span.nextElementSibling;
+                // Close other menus
+                this.element.querySelectorAll('.dropdown-content').forEach(dc => {
+                    if (dc !== content) dc.classList.remove('show');
+                });
+                content.classList.toggle('show');
+            });
+        });
+
+        // Handle nested dropdowns
+        this.element.querySelectorAll('.dropdown .dropdown > span').forEach(span => {
+            span.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent parent menu from closing
+                span.nextElementSibling.classList.toggle('show');
+            });
+        });
+
+        // Handle actions
+        this.element.querySelector('[data-action="new"]').addEventListener('click', () => {
+            this.program.clearCanvas();
+        });
+        this.element.querySelector('[data-action="save-png"]').addEventListener('click', () => {
+            this.program.saveAs('png');
+        });
+        this.element.querySelector('[data-action="save-jpg"]').addEventListener('click', () => {
+            this.program.saveAs('jpg');
+        });
+        this.element.querySelector('[data-action="save-svg"]').addEventListener('click', () => {
+            this.program.saveAs('svg');
+        });
+
+        // Close menus when clicking elsewhere
+        window.addEventListener('click', (e) => {
+            if (!this.element.contains(e.target)) {
+                this.element.querySelectorAll('.dropdown-content').forEach(dc => {
+                    dc.classList.remove('show');
+                });
+            }
+        });
+    }
+}
+
+
+class Ribbon {
+    element;
+    program;
+    toolButtons = {};
+    currentDrawTool = 'rectangle';
+    drawDropdownContent;
+    mainDrawButton;
+
+    constructor(program) {
+        this.program = program;
+        this.element = document.createElement('div');
+        this.element.id = 'ribbon';
 
         let toolGroup = document.createElement('div');
         toolGroup.classList.add('tool-group');
 
+        // 1. Select Tool
+        this.toolButtons['select'] = this._createButton('tool-select', 'Select', Statics.SELECT_ICON);
+        this.toolButtons['select'].addEventListener('click', () => this.setActiveTool('select'));
+        toolGroup.appendChild(this.toolButtons['select']);
 
-        for(let tool of this.tools){
+        // 2. Draw Dropdown
+        this._createDrawDropdown(toolGroup);
 
-            let btn = this._createButton(`tool-${tool.name}`,tool.title,tool.icon);
-            btn.addEventListener('click',()=>{
-                this.setActiveTool(tool.name);
-            });
-            toolGroup.appendChild(btn);
-            this.toolsButtons[tool.name]=btn;
-        }
-        
+        // 3. Pen Tool
+        this.toolButtons['pen'] = this._createButton('tool-pen', 'Pen', Statics.PEN_ICON);
+        this.toolButtons['pen'].addEventListener('click', () => this.setActiveTool('pen'));
+        toolGroup.appendChild(this.toolButtons['pen']);
+
+
         this.element.appendChild(toolGroup);
         document.body.prepend(this.element);
 
         this.setActiveTool('select');
     }
 
-    _createButton(id,title,svgIconHtml){
+    _createDrawDropdown(parentGroup) {
+        let drawGroup = document.createElement('div');
+        drawGroup.className = 'tool-dropdown-group';
+
+        // Main button (shows current tool)
+        this.mainDrawButton = this._createButton('tool-draw-main', 'Draw Shape', Statics.RECT_ICON);
+        this.mainDrawButton.addEventListener('click', () => {
+            this.setActiveTool(this.currentDrawTool);
+        });
+        drawGroup.appendChild(this.mainDrawButton);
+
+        // Dropdown arrow button
+        let dropdownButton = this._createButton('tool-draw-dropdown', 'Select Shape', Statics.CARET_DOWN_ICON);
+        drawGroup.appendChild(dropdownButton);
+
+        // Dropdown content (hidden)
+        this.drawDropdownContent = document.createElement('div');
+        this.drawDropdownContent.className = 'draw-dropdown-content';
+
+        const drawTools = [
+            { name: 'rectangle', title: 'Rectangle', icon: Statics.RECT_ICON },
+            { name: 'line', title: 'Line', icon: Statics.LINE_ICON },
+            { name: 'triangle', title: 'Triangle', icon: Statics.TRIANGLE_ICON },
+        ];
+
+        for (let tool of drawTools) {
+            let item = document.createElement('button');
+            item.innerHTML = `${tool.icon} <span>${tool.title}</span>`;
+            item.addEventListener('click', () => {
+                this.currentDrawTool = tool.name;
+                this.mainDrawButton.innerHTML = tool.icon;
+                this.mainDrawButton.title = tool.title;
+                this.setActiveTool(tool.name);
+                this.drawDropdownContent.classList.remove('show');
+            });
+            this.drawDropdownContent.appendChild(item);
+        }
+
+        drawGroup.appendChild(this.drawDropdownContent);
+        dropdownButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.drawDropdownContent.classList.toggle('show');
+        });
+
+        parentGroup.appendChild(drawGroup);
+    }
+
+    _createButton(id, title, svgIconHtml) {
         let button = document.createElement('button');
         button.id = id;
         button.innerHTML = svgIconHtml;
@@ -574,13 +699,25 @@ class Ribbon{
         return button;
     }
 
-    setActiveTool(toolName){
-        for(let name in this.toolsButtons){
-            this.toolsButtons[name].classList.toggle('active',name === toolName);
-        }
-        if(this.onToolCahnge)
-            this.onToolCahnge(toolName);
+    setActiveTool(toolName) {
+        this.toolButtons['select'].classList.toggle('active', toolName === 'select');
+        this.toolButtons['pen'].classList.toggle('active', toolName === 'pen');
 
+        const isDrawTool = ['rectangle', 'line', 'triangle'].includes(toolName);
+        this.mainDrawButton.classList.toggle('active', isDrawTool);
+        
+        // Update program's active tool
+        this.program.activeTool = toolName;
+        this.program.updateCursor(this.program.canvas.mouseX, this.program.canvas.mouseY);
+        console.log(`Active tool changed to: ${toolName}`);
+
+        // Deselect object if switching to a drawing tool
+        if (toolName !== 'select') {
+            this.program.selectedObject = null;
+        }
+
+        // Close dropdown
+        this.drawDropdownContent.classList.remove('show');
     }
 }
 
@@ -673,15 +810,8 @@ class Program{
 
         this.canvas = new Canvas('main-canvas');
 
-        this.ribbon = new Ribbon((toolName) => {
-            this.activeTool = toolName;
-            this.updateCursor(this.canvas.mouseX, this.canvas.mouseY);
-            console.log(`Active tool changed to: ${toolName}`);
-
-            if(toolName !=='select'){
-                this.selectedObject = null;
-            }
-        });
+        this.topMenuBar = new TopMenuBar(this); // ADD THIS
+        this.ribbon = new Ribbon(this);
 
         this.canvas.resize();
     
@@ -710,7 +840,33 @@ class Program{
         this.context_menu.initListeners();
         
     }
-
+    clearCanvas() {
+        if (confirm('Are you sure you want to clear the canvas?')) {
+            this.drawables = [];
+            this.selectedObject = null;
+            this.dragTarget = null;
+            console.log('Canvas cleared');
+        }
+    }
+    saveAs(format) {
+        if (format === 'png' || format === 'jpg') {
+            const dataURL = this.canvas.canvas.toDataURL(`image/${format}`);
+            this.downloadURI(dataURL, `drawing.${format}`);
+        } else if (format === 'svg') {
+            // SVG export is very complex and requires a separate library
+            // or a function to convert all 'drawables' to SVG path data.
+            console.warn('SVG export is not yet implemented.');
+            alert('SVG export is not yet implemented. This feature requires building an SVG string from all drawn objects.');
+        }
+    }
+    downloadURI(uri, name) {
+        let link = document.createElement('a');
+        link.download = name;
+        link.href = uri;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 
     run(){
         this.mainLoop();
