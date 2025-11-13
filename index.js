@@ -1,3 +1,9 @@
+
+class Statics{
+    static SELECT_ICON =`<svg xmlns="http://www.w.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2L2 12h5v10h10V12h5z" opacity="0"/><path d="M13.29 21.71l-1.41-1.42c-.39-.39-.39-1.02 0-1.41L15.17 15H4c-1.1 0-2-.9-2-2s.9-2 2-2h11.17l-3.29-3.29c-.39-.39-.39-1.02 0-1.41l1.41-1.42c.39-.39 1.02-.39 1.41 0l6 6c.39.39.39 1.02 0 1.41l-6 6c-.39.39-1.03.39-1.41 0z" opacity="0"/><path d="M3.41 12.59l2.83 2.83c.39.39 1.02.39 1.41 0l6-6c.39-.39.39-1.02 0-1.41l-6-6c-.39-.39-1.02-.39-1.41 0l-2.83 2.83c-.39.39-.39 1.02 0 1.41L5.59 8H3c-.55 0-1 .45-1 1s.45 1 1 1h2.59l-2.18 2.18c-.39.39-.39 1.03 0 1.41z" transform="rotate(-45 12 12) translate(-2 -2)"/></svg>`
+    static RECT_ICON=`<svg xmlns="http://www.w.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/></svg>`;
+}
+
 class Drawable{
     constructor(){
         this.position = { x: 0, y: 0 };
@@ -349,6 +355,68 @@ class ContextMenu{
 }
 
 
+
+class Ribbon{
+    element;
+
+    selectButton;
+    rectButton;
+
+    onToolCahnge;
+
+    constructor(onToolChangeCallback){
+        this.onToolCahnge=onToolChangeCallback;
+
+        this.element= document.createElement('div');
+        this.element.id='ribbon';
+
+        let toolGroup = document.createElement('div');
+        toolGroup.classList.add('tool-group');
+
+        this.selectButton = this._createButton(
+            'tool-select',
+            'Select',
+            Statics.SELECT_ICON
+        );
+
+        this.rectButton = this._createButton(
+            'tool-rectangle',
+            'Rectangle',
+            Statics.RECT_ICON
+        );
+
+        this.selectButton.addEventListener('click', () => this.setActiveTool('select'));
+        this.rectButton.addEventListener('click', () => this.setActiveTool('rectangle'));
+
+        toolGroup.appendChild(this.selectButton);
+        toolGroup.appendChild(this.rectButton);
+
+        this.element.appendChild(toolGroup);
+        
+        document.body.prepend(this.element);
+
+        this.setActiveTool('select');
+    }
+
+    _createButton(id,title,svgIconHtml){
+        let button = document.createElement('button');
+        button.id = id;
+        button.innerHTML = svgIconHtml;
+        button.title = title;
+        button.classList.add('tool-button');
+        return button;
+    }
+
+    setActiveTool(toolName){
+        this.selectButton.classList.toggle('active', toolName === 'select');
+        this.rectButton.classList.toggle('active', toolName === 'rectangle');
+        if(this.onToolCahnge)
+            this.onToolCahnge(toolName);
+
+    }
+}
+
+
 class Canvas{
     isMouseDown = false;
     mouseX = 0;
@@ -428,13 +496,25 @@ class Program{
 
     context_menu=null;
 
+    ribbon = null;
+    activeTool='select';
+
     constructor(){
 
         this.canvas = new Canvas('main-canvas');
 
-        let pageSize = getPageSize();
+        this.ribbon = new Ribbon((toolName) => {
+            this.activeTool = toolName;
+            this.updateCursor(this.canvas.mouseX, this.canvas.mouseY);
+            console.log(`Active tool changed to: ${toolName}`);
+        });
 
-        this.canvas.setSize(pageSize.width, pageSize.height);
+        // let pageSize = getPageSize();
+
+        this.canvas.setSize(
+            this.canvas.canvas.clientWidth,
+            this.canvas.canvas.clientHeight
+        );
         this.canvas.clear();
         this.canvas.initMouseListeners();
 
@@ -471,10 +551,12 @@ class Program{
         
         if(this.canvas.isMouseDown){
             this.updateMouseDown(mouseX, mouseY);
-            return;
+            
+        }else{
+            this.updateMouseUp(mouseX,mouseY)
+            this.updateCursor(mouseX, mouseY);
         }
 
-        this.updateMouseUp(mouseX,mouseY)
 
     }
 
@@ -484,11 +566,18 @@ class Program{
                 this.handleClick(mouseX, mouseY);
             }
 
+            if(this.activeTool==='rectangle'){
+                if(this.dragTarget.width < this.clickThreshold || this.dragTarget.height < this.clickThreshold)
+                    this.context_menu.deleteDrawable(this.dragTarget);
+                this.ribbon.setActiveTool('select');
+            }
+
             this.isDragging = false;
             this.resizeHandle = null;
+            this.dragTarget = null;
         }
 
-        this.updateCursor(mouseX, mouseY);
+        // this.updateCursor(mouseX, mouseY);
     }
 
     updateMouseDown(mouseX, mouseY){
@@ -496,7 +585,10 @@ class Program{
         let deltaY = mouseY -  this.lastMouseY;
         if(this.isDragging){
 
-            this.mouseMovedSinceDown = !this.mouseMovedSinceDown && (Math.abs(deltaX) > this.clickThreshold || Math.abs(deltaY) > this.clickThreshold);
+            // this.mouseMovedSinceDown = !this.mouseMovedSinceDown && (Math.abs(deltaX) > this.clickThreshold || Math.abs(deltaY) > this.clickThreshold);
+            if(!this.mouseMovedSinceDown){
+                this.mouseMovedSinceDown = (Math.abs(deltaX) > this.clickThreshold || Math.abs(deltaY) > this.clickThreshold);
+            }
 
             if(this.dragTarget && this.mouseMovedSinceDown)
                 this.handleDrag(deltaX, deltaY);
@@ -511,24 +603,33 @@ class Program{
         this.lastMouseX = mouseX;
         this.lastMouseY = mouseY;
         this.mouseMovedSinceDown = false;
-        
-        let foundTarget =false;
-        for(let i = this.drawables.length -1; i >=0 ; i--){
-            let drawable = this.drawables[i];
-            let handle = drawable.getHandleAtPoint(mouseX, mouseY);
-            if(!handle)continue;
+        if(this.activeTool==='select'){
+            let foundTarget =false;
+            this.dragTarget =null
+            this.resizeHandle =null
+            for(let i = this.drawables.length -1; i >=0 ; i--){
+                let drawable = this.drawables[i];
+                let handle = drawable.getHandleAtPoint(mouseX, mouseY);
+                if(!handle)continue;
 
-            this.dragTarget = drawable;
-            this.resizeHandle = handle;
-            foundTarget=true;
-            break;
+                this.dragTarget = drawable;
+                this.resizeHandle = handle;
+                foundTarget=true;
+                if(this.resizeHandle==='body'){
+                    this.context_menu.bringToFront(this.dragTarget);
+                }
+                break;
+            }
+        }else if(this.activeTool==='rectangle'){
+            this.dragTarget = null;
+            const randomColor = "#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            let newRect = new Rectangle(0,0,randomColor);
+            newRect.setPosition(mouseX+0.5, mouseY+0.5);
+            this.drawables.push(newRect);
+            this.dragTarget = newRect;
+            this.resizeHandle = 'bottom-right';
+            this.items.push(newRect);
         }
-
-        if(foundTarget)return;
-
-        this.dragTarget=null
-        this.resizeHandle=null
-
 
     }
 
@@ -590,47 +691,58 @@ class Program{
     }
 
     handleClick(mouseX, mouseY){
-        console.log(`Clicked on ${this.dragTarget.color} rectangle`)
-
+        if(this.activeTool==='select'){
+            console.log(`Clicked on ${this.dragTarget.color} rectangle`)
+        }
     }
 
     updateCursor(mouseX, mouseY){
-        let cursor = 'default'
-
         if(this.isDragging)return;
-        for(let i = this.drawables.length-1;i>=0;i--){
+        let cursor = 'default'
+        
+        if(this.activeTool==='select'){
 
-            if(this.drawables[i]!==this.dragTarget &&
-                this.dragTarget!==null
-            )continue;
-
-            let handle = this.drawables[i].getHandleAtPoint(mouseX,mouseY);
-            if(!handle)continue;
-            switch (handle) {
-                case 'body':
-                    cursor = 'move';
-                    break;
-                case 'left':
-                case 'right':
-                    cursor = 'ew-resize';
-                    break;
-                case 'top':
-                case 'bottom':
-                    cursor = 'ns-resize';
-                    break;
-                case 'top-left':
-                case 'bottom-right':
-                    cursor = 'nwse-resize';
-                    break;
-                case 'top-right':
-                case 'bottom-left':
-                    cursor = 'nesw-resize';
-                    break;
+            if(this.dragTarget){
+                let handle = this.dragTarget.getHandleAtPoint(mouseX,mouseY);
+                cursor = this.getCursorForHandle(handle);
             }
-            break;
 
+            if(cursor === 'default'){
+                for(let i = this.drawables.length-1;i>=0;i--){
+                    let handle = this.drawables[i].getHandleAtPoint(mouseX,mouseY);
+                    if(handle === 'body'){
+                        cursor = 'move';
+                        break;
+                    }
+                }
+            }    
+        }else if(this.activeTool==='rectangle'){
+             cursor = 'crosshair';
         }
         this.canvas.canvas.style.cursor=cursor
+
+    }
+
+   
+    getCursorForHandle(handle){
+        switch (handle) {
+            case 'body':
+                return 'move';
+            case 'left':
+            case 'right':
+                return 'ew-resize';
+            case 'top':
+            case 'bottom':
+                return 'ns-resize';
+            case 'top-left':
+            case 'bottom-right':
+                return 'nwse-resize';
+            case 'top-right':
+            case 'bottom-left':
+                return 'nesw-resize';
+            default:
+                return null;
+        }
     }
 
 
@@ -640,7 +752,7 @@ class Program{
             drawable.draw(this.canvas.ctx);
         }
 
-        if(this.dragTarget){
+        if(this.dragTarget && this.activeTool==='select'){
             this.dragTarget.drawHandles(this.canvas.ctx);
         }
 
