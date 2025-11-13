@@ -1,7 +1,24 @@
 
 class Statics{
-    static SELECT_ICON =`<svg xmlns="http://www.w.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2L2 12h5v10h10V12h5z" opacity="0"/><path d="M13.29 21.71l-1.41-1.42c-.39-.39-.39-1.02 0-1.41L15.17 15H4c-1.1 0-2-.9-2-2s.9-2 2-2h11.17l-3.29-3.29c-.39-.39-.39-1.02 0-1.41l1.41-1.42c.39-.39 1.02-.39 1.41 0l6 6c.39.39.39 1.02 0 1.41l-6 6c-.39.39-1.03.39-1.41 0z" opacity="0"/><path d="M3.41 12.59l2.83 2.83c.39.39 1.02.39 1.41 0l6-6c.39-.39.39-1.02 0-1.41l-6-6c-.39-.39-1.02-.39-1.41 0l-2.83 2.83c-.39.39-.39 1.02 0 1.41L5.59 8H3c-.55 0-1 .45-1 1s.45 1 1 1h2.59l-2.18 2.18c-.39.39-.39 1.03 0 1.41z" transform="rotate(-45 12 12) translate(-2 -2)"/></svg>`
-    static RECT_ICON=`<svg xmlns="http://www.w.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/></svg>`;
+    static SELECT_ICON =`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+    <path d="M3.41 12.59l2.83 2.83c.39.39 1.02.39 1.41 0l6-6c.39-.39.39-1.02 0-1.41l-6-6c-.39-.39-1.02-.39-1.41 0l-2.83 2.83c-.39.39-.39 1.02 0 1.41L5.59 8H3c-.55 0-1 .45-1 1s.45 1 1 1h2.59l-2.18 2.18c-.39.39-.39 1.03 0 1.41z" transform="rotate(-45 12 12) translate(-2 -2)"/>
+    </svg>`
+    
+    static RECT_ICON=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+    <path d="M4 4h16v16H4z"/>
+    </svg>`;
+
+    static LINE_ICON=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M5 19L19 5"/>
+    </svg>`;
+
+    static TRIANGLE_ICON=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+    <path d="M12 2L2 22h20z"/>
+    </svg>`;
+
+    static PEN_ICON=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+    <path d="M20.71 5.63l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41zM3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25z"/>
+    </svg>`
 }
 
 class Drawable{
@@ -39,16 +56,15 @@ class Drawable{
 
 }
 
-class Rectangle extends Drawable{
-    handleSize = 8;
 
-    constructor(width, height, color){
+class HandleDrawable extends Drawable{
+    constructor(){
         super();
-        this.width = width;
-        this.height = height;
-        this.color = color;
+        this.width=0;
+        this.height=0;
+        this.color='black';
     }
-    
+
     draw(ctx){
         ctx.save();
         ctx.translate(this.position.x, this.position.y);
@@ -120,16 +136,13 @@ class Rectangle extends Drawable{
     }
 
     getHandleAtPoint(x, y){
-        let halfWidth = (this.width * this.scale.x ) / 2;
-        let halfHeight = (this.height * this.scale.y ) / 2;
+        let halfW = this.width / 2;
+        let halfH = this.height / 2;
         let halfHandle = this.handleSize / 2;
-
-        let left = this.position.x - halfWidth;
-        let right = this.position.x + halfWidth;
-        let top = this.position.y - halfHeight;
-        let bottom = this.position.y + halfHeight;
-
-
+        let left = this.position.x - halfW;
+        let right = this.position.x + halfW;
+        let top = this.position.y - halfH;
+        let bottom = this.position.y + halfH;
         if(x>= left - halfHandle && x <= left + halfHandle
             && y >= top - halfHandle && y <= top + halfHandle
         ) return 'top-left';
@@ -165,11 +178,167 @@ class Rectangle extends Drawable{
         if(this.isPointInside(x,y)) return 'body';
 
         return null;
+    }
+}
+
+class Rectangle extends HandleDrawable{
+    handleSize = 8;
+
+    constructor(width, height, color){
+        super();
+        this.width = width;
+        this.height = height;
+        this.color = color;
+    }
+    
+
+    draw(ctx){
+        ctx.save();
+        ctx.translate(this.position.x, this.position.y);
+        ctx.rotate(this.rotation);
+        ctx.scale(this.scale.x, this.scale.y);
         
+        ctx.fillStyle = this.color;
+        ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+        
+        ctx.restore();
+    }
+   
+}
+
+class Line extends HandleDrawable{
+    constructor(width, height, color){
+        super();
+        this.width = width;
+        this.height = height;
+        this.color = color;
+    }
+
+    draw(ctx){
+        ctx.save();
+        ctx.translate(this.position.x, this.position.y);
+        ctx.rotate(this.rotation);
+        ctx.scale(this.scale.x, this.scale.y);
+        
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-this.width / 2, -this.height / 2);
+        ctx.lineTo(this.width / 2, this.height / 2);
+        ctx.stroke();
+        
+        ctx.restore();
+    }
+}
+
+class Triangle extends HandleDrawable{
+    constructor(width, height, color){
+        super();
+        this.width = width;
+        this.height = height;
+        this.color = color;
+    }
+    
+    draw(ctx){
+        ctx.save();
+        ctx.translate(this.position.x, this.position.y);
+        ctx.rotate(this.rotation);
+        ctx.scale(this.scale.x, this.scale.y);
+        
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        // Draw an isosceles triangle
+        ctx.moveTo(0, -this.height / 2); // Top point
+        ctx.lineTo(this.width / 2, this.height / 2); // Bottom-right
+        ctx.lineTo(-this.width / 2, this.height / 2); // Bottom-left
+        ctx.closePath();
+        ctx.fill();
+        
+        ctx.restore();
+    }
+}
+
+class Polyline extends Drawable{
+    constructor(color){
+        super();
+        this.points = [];
+        this.color = color;
+    }
+    addPoint(x, y){
+        this.points.push({ x: x, y: y });
+    }
+
+    draw(ctx) {
+        if (this.points.length < 2) return;
+
+        ctx.save();
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        
+        ctx.moveTo(this.points[0].x, this.points[0].y);
+        for (let i = 1; i < this.points.length; i++) {
+            ctx.lineTo(this.points[i].x, this.points[i].y);
+        }
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    getBounds() {
+        if (this.points.length === 0) {
+            return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
+        }
+
+        let minX = this.points[0].x;
+        let minY = this.points[0].y;
+        let maxX = this.points[0].x;
+        let maxY = this.points[0].y;
+
+        for (let i = 1; i < this.points.length; i++) {
+            minX = Math.min(minX, this.points[i].x);
+            minY = Math.min(minY, this.points[i].y);
+            maxX = Math.max(maxX, this.points[i].x);
+            maxY = Math.max(maxY, this.points[i].y);
+        }
+        
+        return { minX, minY, maxX, maxY };
+    }
+
+    isPointInside(x, y) {
+        // Use bounds for simple selection
+        const bounds = this.getBounds();
+        // Add a small buffer for easier clicking
+        const buffer = 5; 
+        
+        return (x >= bounds.minX - buffer && x <= bounds.maxX + buffer &&
+                y >= bounds.minY - buffer && y <= bounds.maxY + buffer);
+    }
+
+    getHandleAtPoint(x, y) {
+        // Polylines can be moved (body) but not resized with handles
+        if (this.isPointInside(x, y)) {
+            return 'body';
+        }
+        return null;
+    }
+
+    setPosition(x, y) {
+        const bounds = this.getBounds();
+        const centerX = (bounds.minX + bounds.maxX) / 2;
+        const centerY = (bounds.minY + bounds.maxY) / 2;
+        
+        const deltaX = x - centerX;
+        const deltaY = y - centerY;
+
+        for (const point of this.points) {
+            point.x += deltaX;
+            point.y += deltaY;
+        }
+
     }
 
 
-   
 }
 
 class ContextMenuItem{
@@ -359,8 +528,14 @@ class ContextMenu{
 class Ribbon{
     element;
 
-    selectButton;
-    rectButton;
+    toolsButtons={}
+    tools=[
+        {name:'select',icon:Statics.SELECT_ICON,title:'Select' },
+        {name:'rectangle',icon:Statics.RECT_ICON,title:'Rectangle' },
+        {name:'line',icon:Statics.LINE_ICON,title:'Line' },
+        {name:'triangle',icon:Statics.TRIANGLE_ICON,title:'Triangle' },
+        {name:'pen',icon:Statics.PEN_ICON,title:'Pen' },
+    ]
 
     onToolCahnge;
 
@@ -373,26 +548,18 @@ class Ribbon{
         let toolGroup = document.createElement('div');
         toolGroup.classList.add('tool-group');
 
-        this.selectButton = this._createButton(
-            'tool-select',
-            'Select',
-            Statics.SELECT_ICON
-        );
 
-        this.rectButton = this._createButton(
-            'tool-rectangle',
-            'Rectangle',
-            Statics.RECT_ICON
-        );
+        for(let tool of this.tools){
 
-        this.selectButton.addEventListener('click', () => this.setActiveTool('select'));
-        this.rectButton.addEventListener('click', () => this.setActiveTool('rectangle'));
-
-        toolGroup.appendChild(this.selectButton);
-        toolGroup.appendChild(this.rectButton);
-
-        this.element.appendChild(toolGroup);
+            let btn = this._createButton(`tool-${tool.name}`,tool.title,tool.icon);
+            btn.addEventListener('click',()=>{
+                this.setActiveTool(tool.name);
+            });
+            toolGroup.appendChild(btn);
+            this.toolsButtons[tool.name]=btn;
+        }
         
+        this.element.appendChild(toolGroup);
         document.body.prepend(this.element);
 
         this.setActiveTool('select');
@@ -408,8 +575,9 @@ class Ribbon{
     }
 
     setActiveTool(toolName){
-        this.selectButton.classList.toggle('active', toolName === 'select');
-        this.rectButton.classList.toggle('active', toolName === 'rectangle');
+        for(let name in this.toolsButtons){
+            this.toolsButtons[name].classList.toggle('active',name === toolName);
+        }
         if(this.onToolCahnge)
             this.onToolCahnge(toolName);
 
@@ -503,7 +671,7 @@ class Program{
     lastMouseY=0;
 
     mouseMovedSinceDown=false;
-    clickThreshold=1;
+    clickThreshold=5;
 
     context_menu=null;
 
@@ -523,18 +691,24 @@ class Program{
             this.activeTool = toolName;
             this.updateCursor(this.canvas.mouseX, this.canvas.mouseY);
             console.log(`Active tool changed to: ${toolName}`);
+
+            if(toolName !=='select'){
+                this.selectedObject = null;
+            }
         });
 
-        // let pageSize = getPageSize();
+        this.canvas.resize();
+    
+        window.addEventListener('resize', () => {
+            if(this.canvas.resize()){
+                this.update();
+                this.draw();
+            }
+        })
 
-        this.canvas.setSize(
-            this.canvas.canvas.clientWidth,
-            this.canvas.canvas.clientHeight
-        );
         this.canvas.clear();
         this.canvas.initMouseListeners();
 
-        this.canvas.resize();
 
 
         let rect1 = new Rectangle(100, 100, 'red');
@@ -549,13 +723,6 @@ class Program{
         this.context_menu.build();
         this.context_menu.initListeners();
         
-
-        window.addEventListener('resize', () => {
-            if(this.canvas.resize()){
-                this.update();
-                this.draw();
-            }
-        })
     }
 
 
@@ -593,23 +760,44 @@ class Program{
         //     this.handleClick(mouseX, mouseY);
         // }
 
-        if(!this.mouseMovedSinceDown && this.activeTool==='select'){
-            this.selectedObject = this.dragTarget;
+        if(!this.mouseMovedSinceDown){
+            if(this.activeTool==='select'){
+                this.selectedObject = this.dragTarget;
+            }
         }
 
-        if(this.activeTool==='rectangle'){
-            if(this.dragTarget.width < this.clickThreshold || this.dragTarget.height < this.clickThreshold)
-                this.context_menu.deleteDrawable(this.dragTarget);
+        let isDrawingTool = (this.activeTool==='rectangle' || 
+                            this.activeTool==='line' || 
+                            this.activeTool==='triangle' || 
+                            this.activeTool==='pen');
+
+        if(isDrawingTool){
+            if(this.dragTarget.width < this.clickThreshold || 
+                this.dragTarget.height < this.clickThreshold){
+                    this.context_menu.deleteDrawable(this.dragTarget);
+            }else{
+                this.selectedObject = this.dragTarget;
+            }
             this.ribbon.setActiveTool('select');
-            this.selectedObject = this.dragTarget;
+
+        }
+
+        if(this.activetool==='pen'){
+            if(this.dragTarget.points.length <2){
+                this.context_menu.deleteDrawable(this.dragTarget);
+            }else{
+                let bounds = this.dragTarget.getBounds();
+                let centerX = (bounds.minX + bounds.maxX) /2;
+                let centerY = (bounds.minY + bounds.maxY) /2;
+                this.dragTarget.setPosition(centerX,centerY);
+                this.selectedObject = this.dragTarget;
+            }
+            this.ribbon.setActiveTool('select');
         }
 
         this.isDragging = false;
-        this.resizeHandle = null;
         this.dragTarget = null;
-        
-
-        // this.updateCursor(mouseX, mouseY);
+        this.resizeHandle = null;
     }
 
     updateMouseDown(mouseX, mouseY){
@@ -635,37 +823,65 @@ class Program{
         this.lastMouseX = mouseX;
         this.lastMouseY = mouseY;
         this.mouseMovedSinceDown = false;
-        if(this.activeTool==='select'){
-            let foundTarget =false;
-            this.dragTarget =null
-            this.resizeHandle =null
-            for(let i = this.drawables.length -1; i >=0 ; i--){
-                let drawable = this.drawables[i];
-                let handle = drawable.getHandleAtPoint(mouseX, mouseY);
-                if(!handle)continue;
+        this.drawTarget = null;
+        this.resizeHandle = null;
 
-                this.dragTarget = drawable;
-                this.resizeHandle = handle;
-                foundTarget=true;
-                if(this.resizeHandle==='body'){
-                    this.context_menu.bringToFront(this.dragTarget);
+        let randomColor = "#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+
+        switch(this.activeTool){
+            case 'select':
+                if(this.selectedObject){
+                    let handle = this.selectedObject.getHandleAtPoint(mouseX,mouseY);
+                    if(handle){
+                        this.dragTarget = this.selectedObject;
+                        this.resizeHandle = handle;
+                        if(this.resizeHandle==='body'){
+                            this.context_menu.bringToFront(this.dragTarget);
+                        }
+                        return;
+                    }
                 }
-                break;
-            }
-        }else if(this.activeTool==='rectangle'){
-            this.dragTarget = null;
-            
-            this.dragStartX = mouseX;
-            this.dragStartY = mouseY;
 
-            const randomColor = "#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
-            let newRect = new Rectangle(0,0,randomColor);
-            newRect.setPosition(mouseX, mouseY); // Set initial center to start point
+                for(let i = this.drawables.length-1;i>=0;i--){
+                    let drawable = this.drawables[i];
+                    let handle = drawable.getHandleAtPoint(mouseX,mouseY);
+                    if(!handle)continue;
+                    this.dragTarget = drawable;
+                    this.resizeHandle = 'body';
+                    this.context_menu.bringToFront(this.dragTarget);
+                    break;
+                }
+                break 
+
             
-            this.drawables.push(newRect);
-            this.dragTarget = newRect;
-            
-            this.resizeHandle = 'draw';
+            case 'rectangle':
+            case 'line':
+            case 'triangle':
+                this.dragStartX = mouseX;
+                this.dragStartY = mouseY;
+
+                let newShape;
+
+                if(this.activeTool==='rectangle'){
+                    newShape = new Rectangle(0,0,randomColor);
+                }else if(this.activeTool==='line'){
+                    newShape = new Line(0,0,randomColor);
+                }else if(this.activeTool==='triangle'){
+                    newShape = new Triangle(0,0,randomColor);
+                }
+                
+                newShape.setPosition(mouseX,mouseY);
+                this.drawables.push(newShape);
+                this.dragTarget = newShape;
+                this.resizeHandle = 'draw-shape';
+                break;
+            case 'pen':
+                let newPolyline = new Polyline(randomColor);
+                newPolyline.addPoint(mouseX,mouseY);
+                this.drawables.push(newPolyline);
+                this.dragTarget = newPolyline;
+                this.resizeHandle = 'draw-pen';
+                break;
         }
 
     }
@@ -674,34 +890,40 @@ class Program{
         if(!this.dragTarget || !this.resizeHandle) 
             return;
 
-        let target = this.dragTarget
-        
-        switch(this.resizeHandle){
-            case 'draw':{
-                // Get the current mouse position
-                const currentX = this.lastMouseX + deltaX;
-                const currentY = this.lastMouseY + deltaY;
 
-                // Calculate width and height from the *start* corner
+        let target = this.dragTarget;
+        const currentX = this.lastMouseX + deltaX;
+        const currentY = this.lastMouseY + deltaY;
+        switch(this.resizeHandle){
+            case 'draw-shape':{ // Used for rect, line, triangle
                 const newWidth = currentX - this.dragStartX;
                 const newHeight = currentY - this.dragStartY;
-
-                // Calculate the new center position (halfway between start and current)
                 const newCenterX = this.dragStartX + (newWidth / 2);
                 const newCenterY = this.dragStartY + (newHeight / 2);
 
-                // Update the rectangle's properties
-                // Use Math.abs() so it works even if you drag up and left
                 target.width = Math.abs(newWidth);
                 target.height = Math.abs(newHeight);
                 target.position.x = newCenterX;
                 target.position.y = newCenterY;
                 break;
             }
+            case 'draw-pen':
+                target.addPoint(currentX, currentY);
+                break;
             case 'body':
-                target.position.x+=deltaX
-                target.position.y+=deltaY
-                break
+                // For Polyline, which has no 'position'
+                if (target instanceof Polyline) {
+                    // Move all points by delta
+                    for (const point of target.points) {
+                        point.x += deltaX;
+                        point.y += deltaY;
+                    }
+                } else {
+                    // For all other shapes
+                    target.position.x += deltaX;
+                    target.position.y += deltaY;
+                }
+                break;
             case 'left':
                 target.width -= deltaX
                 target.position.x += deltaX/2
@@ -749,33 +971,40 @@ class Program{
     }
 
     handleClick(mouseX, mouseY){
-        if(this.activeTool==='select'){
-            console.log(`Clicked on ${this.dragTarget.color} rectangle`)
-        }
+        // if(this.activeTool==='select'){
+        //     console.log(`Clicked on ${this.dragTarget.color} rectangle`)
+        // }
     }
 
     updateCursor(mouseX, mouseY){
         if(this.isDragging)return;
         let cursor = 'default'
         
-        if(this.activeTool==='select'){
+        switch (this.activeTool) {
+            case 'select':
+                if (this.selectedObject) {
+                    const handle = this.selectedObject.getHandleAtPoint(mouseX, mouseY);
+                    cursor = this.getCursorForHandle(handle);
+                }
 
-            if(this.dragTarget){
-                let handle = this.dragTarget.getHandleAtPoint(mouseX,mouseY);
-                cursor = this.getCursorForHandle(handle);
-            }
-
-            if(cursor === 'default'){
-                for(let i = this.drawables.length-1;i>=0;i--){
-                    let handle = this.drawables[i].getHandleAtPoint(mouseX,mouseY);
-                    if(handle === 'body'){
-                        cursor = 'move';
-                        break;
+                if (cursor === null || cursor === 'default') {
+                    cursor = 'default'; // Reset
+                    for (let i = this.drawables.length - 1; i >= 0; i--) {
+                        const handle = this.drawables[i].getHandleAtPoint(mouseX, mouseY);
+                        if (handle === 'body') {
+                            cursor = 'move';
+                            break;
+                        }
                     }
                 }
-            }    
-        }else if(this.activeTool==='rectangle'){
-             cursor = 'crosshair';
+                break;
+            
+            case 'rectangle':
+            case 'line':
+            case 'triangle':
+            case 'pen':
+                cursor = 'crosshair';
+                break;
         }
         this.canvas.canvas.style.cursor=cursor
 
@@ -810,8 +1039,11 @@ class Program{
             drawable.draw(this.canvas.ctx);
         }
 
-        if(this.selectedObject && this.activeTool==='select'){
-            this.selectedObject.drawHandles(this.canvas.ctx);
+       if(this.selectedObject && this.activeTool==='select'){
+            // Only HandleDrawable and its children have drawHandles
+            if (typeof this.selectedObject.drawHandles === 'function') {
+                this.selectedObject.drawHandles(this.canvas.ctx);
+            }
         }
 
     }
