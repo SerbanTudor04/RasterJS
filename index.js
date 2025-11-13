@@ -809,9 +809,9 @@ class Program{
     constructor(){
 
         this.canvas = new Canvas('main-canvas');
+        this.ribbon = new Ribbon(this);
 
         this.topMenuBar = new TopMenuBar(this); // ADD THIS
-        this.ribbon = new Ribbon(this);
 
         this.canvas.resize();
     
@@ -908,23 +908,22 @@ class Program{
             }
         }
 
-        let isDrawingTool = (this.activeTool==='rectangle' || 
-                            this.activeTool==='line' || 
-                            this.activeTool==='triangle' || 
-                            this.activeTool==='pen');
+        const isShapeTool = (this.activeTool==='rectangle' || 
+                         this.activeTool==='line' || 
+                         this.activeTool==='triangle');
 
-        if(isDrawingTool){
+        if (isShapeTool) {
+            // Check if it was a "click" (no real size)
             if(this.dragTarget.width < this.clickThreshold || 
-                this.dragTarget.height < this.clickThreshold){
-                    this.context_menu.deleteDrawable(this.dragTarget);
-            }else{
+            this.dragTarget.height < this.clickThreshold){
+                this.context_menu.deleteDrawable(this.dragTarget);
+            } else {
                 this.selectedObject = this.dragTarget;
             }
             this.ribbon.setActiveTool('select');
-
         }
 
-        if(this.activetool==='pen'){
+        if(this.activeTool==='pen'){
             if(this.dragTarget.points.length <2){
                 this.context_menu.deleteDrawable(this.dragTarget);
             }else{
@@ -1193,7 +1192,7 @@ class Program{
 
 
 window.addEventListener('load', () => {
-    let program = new Program();
+    window.program = new Program();
     console.log('Program initialized');
     program.run();  
 });
