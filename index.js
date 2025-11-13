@@ -460,6 +460,17 @@ class Canvas{
         })
     }
 
+    resize(){
+        let width = this.canvas.clientWidth;
+        let height = this.canvas.clientHeight;
+        if(this.canvas.width !== width || this.canvas.height !== height){
+            this.setSize(width, height);
+            console.log(`Canvas resized to ${width}x${height}`);
+            return true;
+        }
+        return false;
+    }
+
 
 
 }
@@ -502,6 +513,8 @@ class Program{
     dragStartX=0;
     dragStartY=0;
 
+    selectedObject = null;
+
     constructor(){
 
         this.canvas = new Canvas('main-canvas');
@@ -521,6 +534,8 @@ class Program{
         this.canvas.clear();
         this.canvas.initMouseListeners();
 
+        this.canvas.resize();
+
 
         let rect1 = new Rectangle(100, 100, 'red');
         rect1.setPosition(150, 150);
@@ -533,7 +548,14 @@ class Program{
         this.context_menu= new ContextMenu(this.canvas,this.drawables);
         this.context_menu.build();
         this.context_menu.initListeners();
+        
 
+        window.addEventListener('resize', () => {
+            if(this.canvas.resize()){
+                this.update();
+                this.draw();
+            }
+        })
     }
 
 
@@ -564,21 +586,28 @@ class Program{
     }
 
     updateMouseUp(mouseX, mouseY){
-        if(this.isDragging){
-            if(this.dragTarget && !this.mouseMovedSinceDown){
-                this.handleClick(mouseX, mouseY);
-            }
-
-            if(this.activeTool==='rectangle'){
-                if(this.dragTarget.width < this.clickThreshold || this.dragTarget.height < this.clickThreshold)
-                    this.context_menu.deleteDrawable(this.dragTarget);
-                this.ribbon.setActiveTool('select');
-            }
-
-            this.isDragging = false;
-            this.resizeHandle = null;
-            this.dragTarget = null;
+        if(!this.isDragging){
+            return;
         }
+        // if(this.dragTarget && !this.mouseMovedSinceDown){
+        //     this.handleClick(mouseX, mouseY);
+        // }
+
+        if(!this.mouseMovedSinceDown && this.activeTool==='select'){
+            this.selectedObject = this.dragTarget;
+        }
+
+        if(this.activeTool==='rectangle'){
+            if(this.dragTarget.width < this.clickThreshold || this.dragTarget.height < this.clickThreshold)
+                this.context_menu.deleteDrawable(this.dragTarget);
+            this.ribbon.setActiveTool('select');
+            this.selectedObject = this.dragTarget;
+        }
+
+        this.isDragging = false;
+        this.resizeHandle = null;
+        this.dragTarget = null;
+        
 
         // this.updateCursor(mouseX, mouseY);
     }
@@ -781,8 +810,8 @@ class Program{
             drawable.draw(this.canvas.ctx);
         }
 
-        if(this.dragTarget && this.activeTool==='select'){
-            this.dragTarget.drawHandles(this.canvas.ctx);
+        if(this.selectedObject && this.activeTool==='select'){
+            this.selectedObject.drawHandles(this.canvas.ctx);
         }
 
     }
