@@ -502,6 +502,13 @@ class ContextMenu{
         if (program.dragTarget === drawableToDelete) {
             program.dragTarget = null;
         }
+        
+        // VVV ADD THIS LINE VVV
+        if (program.selectedObject === drawableToDelete) {
+            program.selectedObject = null;
+        }
+        // ^^^ END OF FIX ^^^
+
         if (this.rightClickedTarget === drawableToDelete) {
             this.rightClickedTarget = null;
         }
@@ -641,6 +648,11 @@ class Ribbon {
         document.body.prepend(this.element);
 
         this.setActiveTool('select');
+        window.addEventListener('click', (e) => {
+        if (!this.element.contains(e.target)) {
+            this.drawDropdownContent.classList.remove('show');
+        }
+    });
     }
 
     _createDrawDropdown(parentGroup) {
@@ -964,7 +976,8 @@ class Program{
         this.lastMouseX = mouseX;
         this.lastMouseY = mouseY;
         this.mouseMovedSinceDown = false;
-        this.drawTarget = null;
+        // this.drawTarget = null;
+        this.dragTarget = null;
         this.resizeHandle = null;
 
         let randomColor = "#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
