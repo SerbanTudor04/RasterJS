@@ -349,7 +349,27 @@ class Polyline extends Drawable{
         }
 
     }
+    drawHandles(ctx) {
+        const bounds = this.getBounds();
+        const padding = 5; 
 
+        ctx.save();
+        
+        
+        ctx.strokeStyle = '#000000'; 
+        ctx.lineWidth = 1;
+        ctx.setLineDash([5, 5]); 
+        
+        
+        ctx.strokeRect(
+            bounds.minX - padding, 
+            bounds.minY - padding, 
+            (bounds.maxX - bounds.minX) + padding * 2, 
+            (bounds.maxY - bounds.minY) + padding * 2
+        );
+        
+        ctx.restore();
+    }
 
 }
 
@@ -661,34 +681,64 @@ class Ribbon {
     mainDrawButton;
 
     constructor(program) {
-        this.program = program;
-        this.element = document.createElement('div');
-        this.element.id = 'ribbon';
+    this.program = program;
+    this.element = document.createElement('div');
+    this.element.id = 'ribbon';
 
-        let toolGroup = document.createElement('div');
-        toolGroup.classList.add('tool-group');
+    let toolGroup = document.createElement('div');
+    toolGroup.classList.add('tool-group');
 
-        this.toolButtons['select'] = this._createButton('tool-select', 'Select', Statics.SELECT_ICON);
-        this.toolButtons['select'].addEventListener('click', () => this.setActiveTool('select'));
-        toolGroup.appendChild(this.toolButtons['select']);
+    this.toolButtons['select'] = this._createButton('tool-select', 'Select', Statics.SELECT_ICON);
+    this.toolButtons['select'].addEventListener('click', () => this.setActiveTool('select'));
+    toolGroup.appendChild(this.toolButtons['select']);
 
-        this._createDrawDropdown(toolGroup);
+    this._createDrawDropdown(toolGroup);
 
-        this.toolButtons['pen'] = this._createButton('tool-pen', 'Pen', Statics.PEN_ICON);
-        this.toolButtons['pen'].addEventListener('click', () => this.setActiveTool('pen'));
-        toolGroup.appendChild(this.toolButtons['pen']);
+    this.toolButtons['pen'] = this._createButton('tool-pen', 'Pen', Statics.PEN_ICON);
+    this.toolButtons['pen'].addEventListener('click', () => this.setActiveTool('pen'));
+    toolGroup.appendChild(this.toolButtons['pen']);
 
+    this.element.appendChild(toolGroup);
+    
+    let bgGroup = document.createElement('div');
+    bgGroup.classList.add('tool-group');
+    bgGroup.style.display = 'flex';
+    bgGroup.style.alignItems = 'center';
+    bgGroup.style.padding = '0 5px';
 
-        this.element.appendChild(toolGroup);
-        document.body.prepend(this.element);
+    let bgLabel = document.createElement('span');
+    bgLabel.textContent = 'BG: ';
+    bgLabel.style.fontSize = '14px';
+    bgLabel.style.marginRight = '5px';
+    bgLabel.style.fontFamily = 'sans-serif';
 
-        this.setActiveTool('select');
-        window.addEventListener('click', (e) => {
+    let bgInput = document.createElement('input');
+    bgInput.type = 'color';
+    bgInput.value = '#f0f0f0';
+    bgInput.style.border = 'none';
+    bgInput.style.padding = '0';
+    bgInput.style.width = '30px';
+    bgInput.style.height = '30px';
+    bgInput.style.cursor = 'pointer';
+    bgInput.style.backgroundColor = 'transparent';
+
+    bgInput.addEventListener('input', (e) => {
+        this.program.setBackgroundColor(e.target.value);
+    });
+
+    bgGroup.appendChild(bgLabel);
+    bgGroup.appendChild(bgInput);
+    this.element.appendChild(bgGroup);
+
+    document.body.prepend(this.element);
+    this.setActiveTool('select');
+
+    window.addEventListener('click', (e) => {
         if (!this.element.contains(e.target)) {
             this.drawDropdownContent.classList.remove('show');
         }
     });
-    }
+}
 
     _createDrawDropdown(parentGroup) {
         let drawGroup = document.createElement('div');
@@ -858,6 +908,7 @@ class Program{
     constructor(){
 
         this.canvas = new Canvas('main-canvas');
+        this.backgroundColor = '#f0f0f0';
         this.ribbon = new Ribbon(this);
 
         this.topMenuBar = new TopMenuBar(this); // ADD THIS
@@ -887,7 +938,13 @@ class Program{
         this.context_menu= new ContextMenu(this.canvas,this.drawables);
         this.context_menu.build();
         this.context_menu.initListeners();
+
         
+        
+    }
+
+    setBackgroundColor(color){
+    this.backgroundColor = color;
     }
     clearCanvas() {
         if (confirm('Are you sure you want to clear the canvas?')) {
@@ -1245,7 +1302,9 @@ class Program{
 
 
     draw(){
-        this.canvas.clear();
+        // this.canvas.clear();
+        this.canvas.ctx.fillStyle = this.backgroundColor;
+        this.canvas.ctx.fillRect(0, 0, this.canvas.canvas.width, this.canvas.canvas.height);
         for(const drawable of this.drawables){
             drawable.draw(this.canvas.ctx);
         }
