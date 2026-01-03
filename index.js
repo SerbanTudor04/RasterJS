@@ -1,24 +1,23 @@
-
-class Statics{
-    static SELECT_ICON =`<svg fill="#000000" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+class Statics {
+    static SELECT_ICON = `<svg fill="#000000" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
     <g id="SVGRepo_iconCarrier"> <title>move</title> <path d="M7 23.375l3.625 3.625c0.156 0.156 0.344 0.25 0.563 0.219 0.25 0 0.469-0.063 0.625-0.219l3.594-3.625c0.5-0.5 0.344-0.875-0.375-0.875h-2.438v-5.125h5.063v2.5c0 0.719 0.438 0.844 0.938 0.344l3.594-3.594c0.156-0.156 0.219-0.344 0.219-0.594 0.031-0.219-0.063-0.438-0.219-0.625l-3.594-3.563c-0.5-0.5-0.938-0.375-0.906 0.344v2.438h-5.094v-5.063h2.438c0.719 0 0.875-0.406 0.375-0.906l-3.594-3.563c-0.313-0.313-0.875-0.344-1.188 0l-3.625 3.563c-0.5 0.5-0.344 0.906 0.375 0.906h2.438v5.031h-5.031v-2.406c0-0.719-0.438-0.844-0.938-0.344l-3.594 3.563c-0.156 0.156-0.219 0.375-0.25 0.625 0 0.25 0.094 0.438 0.25 0.594l3.594 3.594c0.5 0.5 0.906 0.375 0.906-0.344v-2.469h5.063v5.094h-2.438c-0.719 0-0.875 0.375-0.375 0.875z"></path> </g>
     </svg>`
     
-    static RECT_ICON=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+    static RECT_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
     <path d="M4 4h16v16H4z"/>
     </svg>`;
 
-    static LINE_ICON=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+    static LINE_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
     <path d="M5 19L19 5"/>
     </svg>`;
 
-    static TRIANGLE_ICON=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+    static TRIANGLE_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
     <path d="M12 2L2 22h20z"/>
     </svg>`;
 
-    static PEN_ICON=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+    static PEN_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
     <path d="M20.71 5.63l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41zM3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25z"/>
     </svg>`
 
@@ -32,86 +31,81 @@ class Statics{
     </svg>`;
 }
 
-class Drawable{
-    constructor(){
+class Drawable {
+    constructor() {
         this.position = { x: 0, y: 0 };
         this.rotation = 0;
         this.scale = { x: 1, y: 1 };
+        this.name = null;
     }
 
-    setPosition(x, y){
+    setPosition(x, y) {
         this.position.x = x;
         this.position.y = y;
     }
 
-    setRotation(angle){
+    setRotation(angle) {
         this.rotation = angle;
     }
 
-    setScale(sx, sy){
+    setScale(sx, sy) {
         this.scale.x = sx;
         this.scale.y = sy;
     }
-    
-    draw(ctx){
-        // To be implemented
-    }
 
-    isPointInside(x,y){
+    draw(ctx) {}
+
+    isPointInside(x, y) {
         return false;
     }
 
-    getHandleAtPoint(x,y){
+    getHandleAtPoint(x, y) {
         return -1;
     }
-
 }
 
 
-class HandleDrawable extends Drawable{
-    constructor(){
+class HandleDrawable extends Drawable {
+    constructor() {
         super();
-        this.width=0;
-        this.height=0;
-        this.fillColor = '#ffffff'; 
+        this.width = 0;
+        this.height = 0;
+        this.fillColor = '#ffffff';
         this.strokeColor = '#000000';
         this.lineWidth = 2;
-        this.handleSize=8;
+        this.handleSize = 8;
     }
 
-    draw(ctx){
+    draw(ctx) {
         ctx.save();
         ctx.translate(this.position.x, this.position.y);
         ctx.rotate(this.rotation);
         ctx.scale(this.scale.x, this.scale.y);
-        
+
         ctx.fillStyle = this.color;
         ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
-        
+
         ctx.restore();
     }
 
-    isPointInside(x, y){
-        let halfWidth = (this.width * this.scale.x ) / 2;
-        let halfHeight = (this.height * this.scale.y ) / 2;
-        
+    isPointInside(x, y) {
+        let halfWidth = (this.width * this.scale.x) / 2;
+        let halfHeight = (this.height * this.scale.y) / 2;
+
         let left = this.position.x - halfWidth;
         let right = this.position.x + halfWidth;
         let top = this.position.y - halfHeight;
         let bottom = this.position.y + halfHeight;
-        
+
         return (x >= left && x <= right && y >= top && y <= bottom);
     }
 
-
-
-    drawHandles(ctx){
+    drawHandles(ctx) {
         ctx.save();
 
         ctx.translate(this.position.x, this.position.y);
         ctx.rotate(this.rotation);
         ctx.scale(this.scale.x, this.scale.y);
-
 
         let halfW = this.width / 2;
         let halfH = this.height / 2;
@@ -119,37 +113,34 @@ class HandleDrawable extends Drawable{
 
         let handles = [
             { x: -halfW, y: -halfH }, // top-left
-            { x: 0,     y: -halfH }, // top
-            { x: halfW,  y: -halfH }, // top-right
-            { x: -halfW, y: 0 },     // left
-            { x: halfW,  y: 0 },     // right
-            { x: -halfW, y: halfH },  // bottom-left
-            { x: 0,     y: halfH },  // bottom
-            { x: halfW,  y: halfH }   // bottom-right
+            { x: 0, y: -halfH }, // top
+            { x: halfW, y: -halfH }, // top-right
+            { x: -halfW, y: 0 }, // left
+            { x: halfW, y: 0 }, // right
+            { x: -halfW, y: halfH }, // bottom-left
+            { x: 0, y: halfH }, // bottom
+            { x: halfW, y: halfH } // bottom-right
         ];
 
         ctx.fillStyle = 'white';
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 1;
 
-        for(let handle of handles){
+        for (let handle of handles) {
             ctx.fillRect(
-                handle.x - handleOffset, 
-                handle.y - handleOffset, 
+                handle.x - handleOffset,
+                handle.y - handleOffset,
                 this.handleSize, this.handleSize);
             ctx.strokeRect(
-                handle.x - handleOffset, 
-                handle.y - handleOffset, 
+                handle.x - handleOffset,
+                handle.y - handleOffset,
                 this.handleSize, this.handleSize);
-
         }
 
         ctx.restore();
-
-
     }
 
-    getHandleAtPoint(x, y){
+    getHandleAtPoint(x, y) {
         let halfW = this.width / 2;
         let halfH = this.height / 2;
         let halfHandle = this.handleSize / 2;
@@ -157,39 +148,39 @@ class HandleDrawable extends Drawable{
         let right = this.position.x + halfW;
         let top = this.position.y - halfH;
         let bottom = this.position.y + halfH;
-        if(x>= left - halfHandle && x <= left + halfHandle
-            && y >= top - halfHandle && y <= top + halfHandle
+        if (x >= left - halfHandle && x <= left + halfHandle &&
+            y >= top - halfHandle && y <= top + halfHandle
         ) return 'top-left';
 
-        if(x>= this.position.x - halfHandle && x <= this.position.x + halfHandle
-            && y >= top - halfHandle && y <= top + halfHandle
+        if (x >= this.position.x - halfHandle && x <= this.position.x + halfHandle &&
+            y >= top - halfHandle && y <= top + halfHandle
         ) return 'top';
 
-        if(x>= right - halfHandle && x <= right + halfHandle
-            && y >= top - halfHandle && y <= top + halfHandle
+        if (x >= right - halfHandle && x <= right + halfHandle &&
+            y >= top - halfHandle && y <= top + halfHandle
         ) return 'top-right';
 
-        if(x>= left - halfHandle && x <= left + halfHandle
-            && y >= this.position.y - halfHandle && y <= this.position.y + halfHandle
+        if (x >= left - halfHandle && x <= left + halfHandle &&
+            y >= this.position.y - halfHandle && y <= this.position.y + halfHandle
         ) return 'left';
 
-        if(x>= right - halfHandle && x <= right + halfHandle
-            && y >= this.position.y - halfHandle && y <= this.position.y + halfHandle
+        if (x >= right - halfHandle && x <= right + halfHandle &&
+            y >= this.position.y - halfHandle && y <= this.position.y + halfHandle
         ) return 'right';
 
-        if(x>= left - halfHandle && x <= left + halfHandle
-            && y >= bottom - halfHandle && y <= bottom + halfHandle
+        if (x >= left - halfHandle && x <= left + halfHandle &&
+            y >= bottom - halfHandle && y <= bottom + halfHandle
         ) return 'bottom-left';
 
-        if(x>= this.position.x - halfHandle && x <= this.position.x + halfHandle
-            && y >= bottom - halfHandle && y <= bottom + halfHandle
+        if (x >= this.position.x - halfHandle && x <= this.position.x + halfHandle &&
+            y >= bottom - halfHandle && y <= bottom + halfHandle
         ) return 'bottom';
 
-        if(x>= right - halfHandle && x <= right + halfHandle
-            && y >= bottom - halfHandle && y <= bottom + halfHandle
+        if (x >= right - halfHandle && x <= right + halfHandle &&
+            y >= bottom - halfHandle && y <= bottom + halfHandle
         ) return 'bottom-right';
 
-        if(this.isPointInside(x,y)) return 'body';
+        if (this.isPointInside(x, y)) return 'body';
 
         return null;
     }
@@ -199,10 +190,10 @@ class HandleDrawable extends Drawable{
     }
 }
 
-class Rectangle extends HandleDrawable{
+class Rectangle extends HandleDrawable {
     handleSize = 8;
 
-    constructor(width, height, fillColor, strokeColor, lineWidth){
+    constructor(width, height, fillColor, strokeColor, lineWidth) {
         super();
         this.width = width;
         this.height = height;
@@ -210,32 +201,29 @@ class Rectangle extends HandleDrawable{
         this.strokeColor = strokeColor;
         this.lineWidth = lineWidth;
     }
-    
 
-    draw(ctx){
+
+    draw(ctx) {
         ctx.save();
         ctx.translate(this.position.x, this.position.y);
         ctx.rotate(this.rotation);
         ctx.scale(this.scale.x, this.scale.y);
-        
-        // fill
+
         ctx.fillStyle = this.fillColor;
         ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
-        
-        // border
-        // @Serbantudor04: only draw stroke if lineWidth > 0
-        if(this.lineWidth > 0){
+
+        if (this.lineWidth > 0) {
             ctx.strokeStyle = this.strokeColor;
             ctx.lineWidth = this.lineWidth;
             ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
         }
-        
+
         ctx.restore();
     }
 
     toSVG() {
         const degree = this.rotation * (180 / Math.PI);
-        
+
         return `
         <g transform="translate(${this.position.x}, ${this.position.y}) rotate(${degree}) scale(${this.scale.x}, ${this.scale.y})">
             <rect 
@@ -249,17 +237,17 @@ class Rectangle extends HandleDrawable{
             />
         </g>`;
     }
-   
+
 }
 
-class Line extends HandleDrawable{
-    constructor(width, height, strokeColor, lineWidth){
+class Line extends HandleDrawable {
+    constructor(width, height, strokeColor, lineWidth) {
         super();
         this.width = width;
         this.height = height;
-        this.strokeColor = strokeColor; //@serbantudor23: lines don t have fill
+        this.strokeColor = strokeColor;
         this.lineWidth = lineWidth;
-        this.fillColor = 'transparent'; //@serbantudor23: no color for inner part
+        this.fillColor = 'transparent';
     }
 
     draw(ctx) {
@@ -267,20 +255,20 @@ class Line extends HandleDrawable{
         ctx.translate(this.position.x, this.position.y);
         ctx.rotate(this.rotation);
         ctx.scale(this.scale.x, this.scale.y);
-        
+
         ctx.strokeStyle = this.strokeColor;
         ctx.lineWidth = this.lineWidth;
-        ctx.lineCap = 'round'; 
+        ctx.lineCap = 'round';
         ctx.beginPath();
         ctx.moveTo(-this.width / 2, -this.height / 2);
         ctx.lineTo(this.width / 2, this.height / 2);
         ctx.stroke();
-        
+
         ctx.restore();
     }
     toSVG() {
         const degree = this.rotation * (180 / Math.PI);
-        
+
         return `
         <g transform="translate(${this.position.x}, ${this.position.y}) rotate(${degree}) scale(${this.scale.x}, ${this.scale.y})">
             <line 
@@ -294,8 +282,8 @@ class Line extends HandleDrawable{
     }
 }
 
-class Triangle extends HandleDrawable{
-    constructor(width, height, fillColor, strokeColor, lineWidth){
+class Triangle extends HandleDrawable {
+    constructor(width, height, fillColor, strokeColor, lineWidth) {
         super();
         this.width = width;
         this.height = height;
@@ -303,13 +291,13 @@ class Triangle extends HandleDrawable{
         this.strokeColor = strokeColor;
         this.lineWidth = lineWidth;
     }
-    
-    draw(ctx){
+
+    draw(ctx) {
         ctx.save();
         ctx.translate(this.position.x, this.position.y);
         ctx.rotate(this.rotation);
         ctx.scale(this.scale.x, this.scale.y);
-        
+
         ctx.beginPath();
         ctx.moveTo(0, -this.height / 2); // Top
         ctx.lineTo(this.width / 2, this.height / 2); // Bottom Right
@@ -319,20 +307,20 @@ class Triangle extends HandleDrawable{
         ctx.fillStyle = this.fillColor;
         ctx.fill();
 
-        if(this.lineWidth > 0){
+        if (this.lineWidth > 0) {
             ctx.lineWidth = this.lineWidth;
             ctx.strokeStyle = this.strokeColor;
             ctx.stroke();
         }
-        
+
         ctx.restore();
     }
     toSVG() {
         const degree = this.rotation * (180 / Math.PI);
-        
-        const p1 = `0,${-this.height / 2}`;             // Top
-        const p2 = `${this.width / 2},${this.height / 2}`;   // Bottom Right
-        const p3 = `${-this.width / 2},${this.height / 2}`;  // Bottom Left
+
+        const p1 = `0,${-this.height / 2}`;
+        const p2 = `${this.width / 2},${this.height / 2}`;
+        const p3 = `${-this.width / 2},${this.height / 2}`;
 
         return `
         <g transform="translate(${this.position.x}, ${this.position.y}) rotate(${degree}) scale(${this.scale.x}, ${this.scale.y})">
@@ -346,15 +334,15 @@ class Triangle extends HandleDrawable{
     }
 }
 
-class Polyline extends Drawable{
-    constructor(strokeColor, lineWidth){
+class Polyline extends Drawable {
+    constructor(strokeColor, lineWidth) {
         super();
         this.points = [];
         this.strokeColor = strokeColor;
         this.lineWidth = lineWidth;
-        this.fillColor = 'transparent'; 
+        this.fillColor = 'transparent';
     }
-    addPoint(x, y){
+    addPoint(x, y) {
         this.points.push({ x: x, y: y });
     }
 
@@ -367,7 +355,7 @@ class Polyline extends Drawable{
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.beginPath();
-        
+
         ctx.moveTo(this.points[0].x, this.points[0].y);
         for (let i = 1; i < this.points.length; i++) {
             ctx.lineTo(this.points[i].x, this.points[i].y);
@@ -393,16 +381,16 @@ class Polyline extends Drawable{
             maxX = Math.max(maxX, this.points[i].x);
             maxY = Math.max(maxY, this.points[i].y);
         }
-        
+
         return { minX, minY, maxX, maxY };
     }
 
     isPointInside(x, y) {
         const bounds = this.getBounds();
-        const buffer = 5; 
-        
+        const buffer = 5;
+
         return (x >= bounds.minX - buffer && x <= bounds.maxX + buffer &&
-                y >= bounds.minY - buffer && y <= bounds.maxY + buffer);
+            y >= bounds.minY - buffer && y <= bounds.maxY + buffer);
     }
 
     getHandleAtPoint(x, y) {
@@ -416,7 +404,7 @@ class Polyline extends Drawable{
         const bounds = this.getBounds();
         const centerX = (bounds.minX + bounds.maxX) / 2;
         const centerY = (bounds.minY + bounds.maxY) / 2;
-        
+
         const deltaX = x - centerX;
         const deltaY = y - centerY;
 
@@ -428,23 +416,23 @@ class Polyline extends Drawable{
     }
     drawHandles(ctx) {
         const bounds = this.getBounds();
-        const padding = 5; 
+        const padding = 5;
 
         ctx.save();
-        
-        
-        ctx.strokeStyle = '#000000'; 
+
+
+        ctx.strokeStyle = '#000000';
         ctx.lineWidth = 1;
-        ctx.setLineDash([5, 5]); 
-        
-        
+        ctx.setLineDash([5, 5]);
+
+
         ctx.strokeRect(
-            bounds.minX - padding, 
-            bounds.minY - padding, 
-            (bounds.maxX - bounds.minX) + padding * 2, 
+            bounds.minX - padding,
+            bounds.minY - padding,
+            (bounds.maxX - bounds.minX) + padding * 2,
             (bounds.maxY - bounds.minY) + padding * 2
         );
-        
+
         ctx.restore();
     }
 
@@ -484,11 +472,11 @@ class Ellipse extends HandleDrawable {
 
         ctx.beginPath();
         ctx.ellipse(0, 0, Math.abs(this.width / 2), Math.abs(this.height / 2), 0, 0, 2 * Math.PI);
-        
+
         ctx.fillStyle = this.fillColor;
         ctx.fill();
 
-        if(this.lineWidth > 0){
+        if (this.lineWidth > 0) {
             ctx.lineWidth = this.lineWidth;
             ctx.strokeStyle = this.strokeColor;
             ctx.stroke();
@@ -499,7 +487,6 @@ class Ellipse extends HandleDrawable {
 
     toSVG() {
         const degree = this.rotation * (180 / Math.PI);
-        // rx and ry are radius (half width/height)
         return `
         <g transform="translate(${this.position.x}, ${this.position.y}) rotate(${degree}) scale(${this.scale.x}, ${this.scale.y})">
             <ellipse 
@@ -521,67 +508,64 @@ class Circle extends Ellipse {
     }
 }
 
-class ContextMenuItem{
-    context_menu=null;
+class ContextMenuItem {
+    context_menu = null;
     name = null;
-    id=null;
-    formated_name=null;
-    element=null;
-    hiddeable=false;
-    callback=null;
-    constructor(_context_menu,_name,_hiddeable,_callback){
-        this.context_menu =_context_menu
-        this.name=_name
-        this.id=`menu-${this.name}`
-        this.formated_name=String(this.name).toLocaleUpperCase().replace(" ","-")
-        this.hiddeable=_hiddeable
-        this.callback=_callback
+    id = null;
+    formated_name = null;
+    element = null;
+    hiddeable = false;
+    callback = null;
+    constructor(_context_menu, _name, _hiddeable, _callback) {
+        this.context_menu = _context_menu
+        this.name = _name
+        this.id = `menu-${this.name}`
+        this.formated_name = String(this.name).toLocaleUpperCase().replace(" ", "-")
+        this.hiddeable = _hiddeable
+        this.callback = _callback
         this.build();
     }
 
-    build(){
-        this.element=document.createElement('li')
-        this.element.id=this.id
-        this.element.textContent=this.name
-        this.element.addEventListener('click',this.callback)
+    build() {
+        this.element = document.createElement('li')
+        this.element.id = this.id
+        this.element.textContent = this.name
+        this.element.addEventListener('click', this.callback)
     }
 
-    hide(){
-        if(!this.hiddeable)return
-        this.element.style.display='none'
+    hide() {
+        if (!this.hiddeable) return
+        this.element.style.display = 'none'
     }
 
-    show(){
-        this.element.style.display='block'
+    show() {
+        this.element.style.display = 'block'
 
     }
-    
+
 
 }
 
-class ContextMenu{
+class ContextMenu {
 
-    context_menu_div =null
-    canvas=null
-    drawables=null
-    items=[]
-    rightClickedTarget=null;
-    constructor(_canvas,_drawables){
-        this.canvas=_canvas;
-        this.drawables=_drawables;
+    context_menu_div = null
+    canvas = null
+    drawables = null
+    items = []
+    rightClickedTarget = null;
+    constructor(_canvas, _drawables) {
+        this.canvas = _canvas;
+        this.drawables = _drawables;
 
     }
 
-    
-
-    build(){
-
+    build() {
         this.context_menu_div = document.createElement("div")
         this.context_menu_div.classList.add("context-menu")
         this.context_menu_div.id = "custom-context-menu"
 
         const ul = document.createElement("ul");
-    
+
         this.items.push(new ContextMenuItem(
             this,
             'Bring to Front',
@@ -628,38 +612,36 @@ class ContextMenu{
         document.body.appendChild(this.context_menu_div)
     }
 
-    initListeners(){
-        this.canvas.canvas.addEventListener("contextmenu", (e)=>{
+    initListeners() {
+        this.canvas.canvas.addEventListener("contextmenu", (e) => {
             e.preventDefault();
 
-            let mouseX= this.canvas.mouseX;
-            let mouseY= this.canvas.mouseY;
-            this.rightClickedTarget=null;
+            let mouseX = this.canvas.mouseX;
+            let mouseY = this.canvas.mouseY;
+            this.rightClickedTarget = null;
 
-            for(let i =this.drawables.length -1 ;i>=0;i--){
-                if(!this.drawables[i].isPointInside(mouseX,mouseY))
+            for (let i = this.drawables.length - 1; i >= 0; i--) {
+                if (!this.drawables[i].isPointInside(mouseX, mouseY))
                     continue;
 
-                this.rightClickedTarget=this.drawables[i];
+                this.rightClickedTarget = this.drawables[i];
                 break;
             }
 
-            if(!this.rightClickedTarget){
-                this.context_menu_div.style.display='none'
+            if (!this.rightClickedTarget) {
+                this.context_menu_div.style.display = 'none'
                 return
             }
 
             this.context_menu_div.style.left = `${e.clientX}px`
             this.context_menu_div.style.top = `${e.clientY}px`
-            this.context_menu_div.style.display =`block`
-
-            console.log(`Right-clicked on ${this.rightClickedTarget.color} rectangle`);
+            this.context_menu_div.style.display = `block`
 
         })
 
 
-        window.addEventListener('click',(e)=>{
-            this.context_menu_div.style.display='none'
+        window.addEventListener('click', (e) => {
+            this.context_menu_div.style.display = 'none'
 
         })
 
@@ -678,7 +660,7 @@ class ContextMenu{
         if (program.dragTarget === drawableToDelete) {
             program.dragTarget = null;
         }
-        
+
         if (program.selectedObject === drawableToDelete) {
             program.selectedObject = null;
         }
@@ -694,7 +676,7 @@ class ContextMenu{
         if (index > -1) {
             this.drawables.splice(index, 1);
         }
-        
+
         this.drawables.push(drawableToMove);
     }
 
@@ -703,7 +685,7 @@ class ContextMenu{
         if (index > -1) {
             this.drawables.splice(index, 1);
         }
-        
+
         this.drawables.unshift(drawableToMove);
     }
 
@@ -743,11 +725,9 @@ class TopMenuBar {
     }
 
     addListeners() {
-        // Handle dropdown opening/closing
         this.element.querySelectorAll('.menu-item.dropdown > span').forEach(span => {
             span.addEventListener('click', (e) => {
                 let content = span.nextElementSibling;
-                // Close other menus
                 this.element.querySelectorAll('.dropdown-content').forEach(dc => {
                     if (dc !== content) dc.classList.remove('show');
                 });
@@ -763,7 +743,7 @@ class TopMenuBar {
             });
         });
 
-    
+
         this.element.querySelector('[data-action="new"]').addEventListener('click', () => {
             this.program.clearCanvas();
         });
@@ -797,164 +777,160 @@ class Ribbon {
     mainDrawButton;
 
     constructor(program) {
-    this.program = program;
-    this.element = document.createElement('div');
-    this.element.id = 'ribbon';
+        this.program = program;
+        this.element = document.createElement('div');
+        this.element.id = 'ribbon';
 
-    let toolGroup = document.createElement('div');
-    toolGroup.classList.add('tool-group');
+        let toolGroup = document.createElement('div');
+        toolGroup.classList.add('tool-group');
 
-    this.toolButtons['select'] = this._createButton('tool-select', 'Select', Statics.SELECT_ICON);
-    this.toolButtons['select'].addEventListener('click', () => this.setActiveTool('select'));
-    toolGroup.appendChild(this.toolButtons['select']);
+        this.toolButtons['select'] = this._createButton('tool-select', 'Select', Statics.SELECT_ICON);
+        this.toolButtons['select'].addEventListener('click', () => this.setActiveTool('select'));
+        toolGroup.appendChild(this.toolButtons['select']);
 
-    this._createDrawDropdown(toolGroup);
+        this._createDrawDropdown(toolGroup);
 
-    this.toolButtons['pen'] = this._createButton('tool-pen', 'Pen', Statics.PEN_ICON);
-    this.toolButtons['pen'].addEventListener('click', () => this.setActiveTool('pen'));
-    toolGroup.appendChild(this.toolButtons['pen']);
+        this.toolButtons['pen'] = this._createButton('tool-pen', 'Pen', Statics.PEN_ICON);
+        this.toolButtons['pen'].addEventListener('click', () => this.setActiveTool('pen'));
+        toolGroup.appendChild(this.toolButtons['pen']);
 
-    this.element.appendChild(toolGroup);
-    
-    let bgGroup = document.createElement('div');
-    bgGroup.classList.add('tool-group');
-    bgGroup.style.display = 'flex';
-    bgGroup.style.alignItems = 'center';
-    bgGroup.style.padding = '0 5px';
+        this.element.appendChild(toolGroup);
 
-    let bgLabel = document.createElement('span');
-    bgLabel.textContent = 'BG: ';
-    bgLabel.style.fontSize = '14px';
-    bgLabel.style.marginRight = '5px';
-    bgLabel.style.fontFamily = 'sans-serif';
+        let bgGroup = document.createElement('div');
+        bgGroup.classList.add('tool-group');
+        bgGroup.style.display = 'flex';
+        bgGroup.style.alignItems = 'center';
+        bgGroup.style.padding = '0 5px';
 
-    let bgInput = document.createElement('input');
-    bgInput.type = 'color';
-    bgInput.value = '#f0f0f0';
-    bgInput.style.border = 'none';
-    bgInput.style.padding = '0';
-    bgInput.style.width = '30px';
-    bgInput.style.height = '30px';
-    bgInput.style.cursor = 'pointer';
-    bgInput.style.backgroundColor = 'transparent';
+        let bgLabel = document.createElement('span');
+        bgLabel.textContent = 'BG: ';
+        bgLabel.style.fontSize = '14px';
+        bgLabel.style.marginRight = '5px';
+        bgLabel.style.fontFamily = 'sans-serif';
 
-    bgInput.addEventListener('input', (e) => {
-        this.program.setBackgroundColor(e.target.value);
-    });
+        let bgInput = document.createElement('input');
+        bgInput.type = 'color';
+        bgInput.value = '#f0f0f0';
+        bgInput.style.border = 'none';
+        bgInput.style.padding = '0';
+        bgInput.style.width = '30px';
+        bgInput.style.height = '30px';
+        bgInput.style.cursor = 'pointer';
+        bgInput.style.backgroundColor = 'transparent';
 
-    bgGroup.appendChild(bgLabel);
-    bgGroup.appendChild(bgInput);
-    this.element.appendChild(bgGroup);
+        bgInput.addEventListener('input', (e) => {
+            this.program.setBackgroundColor(e.target.value);
+        });
 
-    let propGroup = document.createElement('div');
-    propGroup.classList.add('tool-group');
-    propGroup.style.display = 'flex';
-    propGroup.style.alignItems = 'center';
-    propGroup.style.padding = '0 5px';
-    propGroup.style.gap = '8px';
+        bgGroup.appendChild(bgLabel);
+        bgGroup.appendChild(bgInput);
+        this.element.appendChild(bgGroup);
 
-    // 1. FILL Color
-    let fillContainer = document.createElement('div');
-    fillContainer.style.display = 'flex';
-    fillContainer.style.alignItems = 'center';
-    
-    let fillLabel = document.createElement('span');
-    fillLabel.textContent = 'Fill:';
-    fillLabel.style.fontSize = '12px';
-    fillLabel.style.marginRight = '3px';
+        let propGroup = document.createElement('div');
+        propGroup.classList.add('tool-group');
+        propGroup.style.display = 'flex';
+        propGroup.style.alignItems = 'center';
+        propGroup.style.padding = '0 5px';
+        propGroup.style.gap = '8px';
 
-    this.fillInput = document.createElement('input'); 
-    this.fillInput.type = 'color';
-    this.fillInput.value = '#ff0000'; // Default
-    this.fillInput.style.border = 'none';
-    this.fillInput.style.width = '25px';
-    this.fillInput.style.height = '25px';
-    this.fillInput.style.cursor = 'pointer';
+        let fillContainer = document.createElement('div');
+        fillContainer.style.display = 'flex';
+        fillContainer.style.alignItems = 'center';
 
-    this.fillInput.addEventListener('input', (e) => {
-        this.program.setFillColor(e.target.value);
-    });
-    fillContainer.appendChild(fillLabel);
-    fillContainer.appendChild(this.fillInput);
+        let fillLabel = document.createElement('span');
+        fillLabel.textContent = 'Fill:';
+        fillLabel.style.fontSize = '12px';
+        fillLabel.style.marginRight = '3px';
 
-    let strokeContainer = document.createElement('div');
-    strokeContainer.style.display = 'flex';
-    strokeContainer.style.alignItems = 'center';
+        this.fillInput = document.createElement('input');
+        this.fillInput.type = 'color';
+        this.fillInput.value = '#ff0000';
+        this.fillInput.style.border = 'none';
+        this.fillInput.style.width = '25px';
+        this.fillInput.style.height = '25px';
+        this.fillInput.style.cursor = 'pointer';
 
-    let strokeLabel = document.createElement('span');
-    strokeLabel.textContent = 'Stroke:';
-    strokeLabel.style.fontSize = '12px';
-    strokeLabel.style.marginRight = '3px';
+        this.fillInput.addEventListener('input', (e) => {
+            this.program.setFillColor(e.target.value);
+        });
+        fillContainer.appendChild(fillLabel);
+        fillContainer.appendChild(this.fillInput);
 
-    this.strokeInput = document.createElement('input'); 
-    this.strokeInput.type = 'color';
-    this.strokeInput.value = '#000000'; 
-    this.strokeInput.style.border = 'none';
-    this.strokeInput.style.width = '25px';
-    this.strokeInput.style.height = '25px';
-    this.strokeInput.style.cursor = 'pointer';
+        let strokeContainer = document.createElement('div');
+        strokeContainer.style.display = 'flex';
+        strokeContainer.style.alignItems = 'center';
 
-    this.strokeInput.addEventListener('input', (e) => {
-        this.program.setStrokeColor(e.target.value);
-    });
-    strokeContainer.appendChild(strokeLabel);
-    strokeContainer.appendChild(this.strokeInput);
+        let strokeLabel = document.createElement('span');
+        strokeLabel.textContent = 'Stroke:';
+        strokeLabel.style.fontSize = '12px';
+        strokeLabel.style.marginRight = '3px';
 
-    let widthContainer = document.createElement('div');
-    widthContainer.style.display = 'flex';
-    widthContainer.style.alignItems = 'center';
+        this.strokeInput = document.createElement('input');
+        this.strokeInput.type = 'color';
+        this.strokeInput.value = '#000000';
+        this.strokeInput.style.border = 'none';
+        this.strokeInput.style.width = '25px';
+        this.strokeInput.style.height = '25px';
+        this.strokeInput.style.cursor = 'pointer';
 
-    let widthLabel = document.createElement('span');
-    widthLabel.textContent = 'W:';
-    widthLabel.style.fontSize = '12px';
-    widthLabel.style.marginRight = '3px';
+        this.strokeInput.addEventListener('input', (e) => {
+            this.program.setStrokeColor(e.target.value);
+        });
+        strokeContainer.appendChild(strokeLabel);
+        strokeContainer.appendChild(this.strokeInput);
 
-    this.widthInput = document.createElement('input'); 
-    this.widthInput.type = 'number';
-    this.widthInput.min = '0';
-    this.widthInput.max = '50';
-    this.widthInput.value = '2';
-    this.widthInput.style.width = '40px';
-    this.widthInput.style.padding = '2px';
+        let widthContainer = document.createElement('div');
+        widthContainer.style.display = 'flex';
+        widthContainer.style.alignItems = 'center';
 
-    this.widthInput.addEventListener('input', (e) => {
-        this.program.setDrawWidth(e.target.value);
-    });
-    widthContainer.appendChild(widthLabel);
-    widthContainer.appendChild(this.widthInput);
+        let widthLabel = document.createElement('span');
+        widthLabel.textContent = 'W:';
+        widthLabel.style.fontSize = '12px';
+        widthLabel.style.marginRight = '3px';
 
-    propGroup.appendChild(fillContainer);
-    propGroup.appendChild(strokeContainer);
-    propGroup.appendChild(widthContainer);
-    
-    this.element.appendChild(propGroup);
+        this.widthInput = document.createElement('input');
+        this.widthInput.type = 'number';
+        this.widthInput.min = '0';
+        this.widthInput.max = '50';
+        this.widthInput.value = '2';
+        this.widthInput.style.width = '40px';
+        this.widthInput.style.padding = '2px';
 
-    document.body.prepend(this.element);
-    this.setActiveTool('select');
+        this.widthInput.addEventListener('input', (e) => {
+            this.program.setDrawWidth(e.target.value);
+        });
+        widthContainer.appendChild(widthLabel);
+        widthContainer.appendChild(this.widthInput);
 
-    window.addEventListener('click', (e) => {
-        if (!this.element.contains(e.target)) {
-            this.drawDropdownContent.classList.remove('show');
-        }
-    });
-}
+        propGroup.appendChild(fillContainer);
+        propGroup.appendChild(strokeContainer);
+        propGroup.appendChild(widthContainer);
+
+        this.element.appendChild(propGroup);
+
+        document.body.prepend(this.element);
+        this.setActiveTool('select');
+
+        window.addEventListener('click', (e) => {
+            if (!this.element.contains(e.target)) {
+                this.drawDropdownContent.classList.remove('show');
+            }
+        });
+    }
 
     _createDrawDropdown(parentGroup) {
         let drawGroup = document.createElement('div');
         drawGroup.className = 'tool-dropdown-group';
 
-        // Main button (shows current tool)
         this.mainDrawButton = this._createButton('tool-draw-main', 'Draw Shape', Statics.RECT_ICON);
         this.mainDrawButton.addEventListener('click', () => {
             this.setActiveTool(this.currentDrawTool);
         });
         drawGroup.appendChild(this.mainDrawButton);
 
-        // Dropdown arrow button
         let dropdownButton = this._createButton('tool-draw-dropdown', 'Select Shape', Statics.CARET_DOWN_ICON);
         drawGroup.appendChild(dropdownButton);
 
-        // Dropdown content (hidden)
         this.drawDropdownContent = document.createElement('div');
         this.drawDropdownContent.className = 'draw-dropdown-content';
 
@@ -1003,47 +979,43 @@ class Ribbon {
 
         const isDrawTool = ['rectangle', 'line', 'triangle', 'ellipse', 'circle'].includes(toolName);
         this.mainDrawButton.classList.toggle('active', isDrawTool);
-        
-        // Update program's active tool
+
         this.program.activeTool = toolName;
         this.program.updateCursor(this.program.canvas.mouseX, this.program.canvas.mouseY);
-        console.log(`Active tool changed to: ${toolName}`);
 
-        // Deselect object if switching to a drawing tool
         if (toolName !== 'select') {
             this.program.selectedObject = null;
         }
 
-        // Close dropdown
         this.drawDropdownContent.classList.remove('show');
     }
 }
 
 
-class Canvas{
+class Canvas {
     isMouseDown = false;
     mouseX = 0;
     mouseY = 0;
 
-    constructor(canvasId){
+    constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
-        if(!this.canvas){
+        if (!this.canvas) {
             throw new Error(`Canvas with id ${canvasId} not found`);
         }
         this.ctx = this.canvas.getContext('2d');
     }
 
-    setSize(width, height){
+    setSize(width, height) {
         this.canvas.width = width;
         this.canvas.height = height;
     }
 
-    clear(){
+    clear() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
 
-    initMouseListeners(){
+    initMouseListeners() {
         this.canvas.addEventListener('mousemove', (event) => {
             let rect = this.canvas.getBoundingClientRect();
             this.mouseX = event.clientX - rect.left;
@@ -1063,19 +1035,15 @@ class Canvas{
         })
     }
 
-    resize(){
+    resize() {
         let width = this.canvas.clientWidth;
         let height = this.canvas.clientHeight;
-        if(this.canvas.width !== width || this.canvas.height !== height){
+        if (this.canvas.width !== width || this.canvas.height !== height) {
             this.setSize(width, height);
-            console.log(`Canvas resized to ${width}x${height}`);
             return true;
         }
         return false;
     }
-
-
-
 }
 
 class LayersPanel {
@@ -1087,65 +1055,20 @@ class LayersPanel {
     }
 
     build() {
-        
         this.container = document.createElement('div');
         this.container.id = 'layers-panel';
-        
+
         const header = document.createElement('div');
         header.id = 'layers-header';
         header.textContent = 'Layers / Figures';
-        
+
         this.listElement = document.createElement('ul');
         this.listElement.id = 'layers-list';
-        
+
         this.container.appendChild(header);
         this.container.appendChild(this.listElement);
     }
 
-    update() {
-        this.listElement.innerHTML = '';
-        
-        for (let i = this.program.drawables.length - 1; i >= 0; i--) {
-            const drawable = this.program.drawables[i];
-            const li = document.createElement('li');
-            li.className = 'layer-item';
-
-            if (this.program.selectedObject === drawable) {
-                li.classList.add('active');
-            }
-
-            li.addEventListener('click', () => {
-                this.program.selectedObject = drawable;
-                this.program.ribbon.setActiveTool('select');
-                this.update();
-                this.program.draw();
-            });
-
-            const preview = document.createElement('span');
-            preview.className = 'layer-preview';
-            let color = drawable.fillColor || drawable.strokeColor || '#000';
-            if (color === 'transparent') color = drawable.strokeColor;
-            preview.style.backgroundColor = color;
-
-            const nameSpan = this._createEditableName(drawable, i, li);
-
-            const delBtn = document.createElement('button');
-            delBtn.className = 'layer-delete';
-            delBtn.innerHTML = '&times;';
-            delBtn.title = 'Delete Figure';
-            
-            delBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.program.context_menu.deleteDrawable(drawable);
-            });
-
-            li.appendChild(preview);
-            li.appendChild(nameSpan);
-            li.appendChild(delBtn);
-            
-            this.listElement.appendChild(li);
-        }
-    }
     _createEditableName(drawable, index, parentLi) {
         const span = document.createElement('span');
         span.textContent = drawable.name || `${drawable.constructor.name} ${index + 1}`;
@@ -1156,7 +1079,7 @@ class LayersPanel {
             e.stopPropagation();
             this.program.selectedObject = drawable;
             this.program.ribbon.setActiveTool('select');
-            
+
             document.querySelectorAll('.layer-item').forEach(item => item.classList.remove('active'));
             parentLi.classList.add('active');
             this.program.draw();
@@ -1189,45 +1112,91 @@ class LayersPanel {
 
         return span;
     }
+
+    update() {
+        this.listElement.innerHTML = '';
+
+        for (let i = this.program.drawables.length - 1; i >= 0; i--) {
+            const drawable = this.program.drawables[i];
+            const li = document.createElement('li');
+            li.className = 'layer-item';
+
+            if (this.program.selectedObject === drawable) {
+                li.classList.add('active');
+            }
+
+            li.addEventListener('click', () => {
+                this.program.selectedObject = drawable;
+                this.program.ribbon.setActiveTool('select');
+                this.update();
+                this.program.draw();
+            });
+
+            const preview = document.createElement('span');
+            preview.className = 'layer-preview';
+            let color = drawable.fillColor || drawable.strokeColor || '#000';
+            if (color === 'transparent') color = drawable.strokeColor;
+            preview.style.backgroundColor = color;
+
+            const nameSpan = this._createEditableName(drawable, i, li);
+
+            const delBtn = document.createElement('button');
+            delBtn.className = 'layer-delete';
+            delBtn.innerHTML = '&times;';
+            delBtn.title = 'Delete Figure';
+
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.program.context_menu.deleteDrawable(drawable);
+            });
+
+            li.appendChild(preview);
+            li.appendChild(nameSpan);
+            li.appendChild(delBtn);
+
+            this.listElement.appendChild(li);
+        }
+    }
 }
-class Program{
+
+class Program {
 
     drawables = [];
     isDragging = false;
     dragTarget = null;
     dragOffset = { x: 0, y: 0 };
 
-    resizeHandle=null;
+    resizeHandle = null;
 
-    lastMouseX=0;
-    lastMouseY=0;
+    lastMouseX = 0;
+    lastMouseY = 0;
 
-    mouseMovedSinceDown=false;
-    clickThreshold=5;
+    mouseMovedSinceDown = false;
+    clickThreshold = 5;
 
-    context_menu=null;
+    context_menu = null;
 
     ribbon = null;
-    activeTool='select';
+    activeTool = 'select';
 
-    dragStartX=0;
-    dragStartY=0;
+    dragStartX = 0;
+    dragStartY = 0;
 
     selectedObject = null;
 
-    constructor(){
-        this.currentFillColor = '#ff0000'; // default color
-        this.currentStrokeColor = '#000000'; // default stroke color
-        this.currentLineWidth = 2;         // default width
+    constructor() {
+        this.currentFillColor = '#ff0000';
+        this.currentStrokeColor = '#000000';
+        this.currentLineWidth = 2;
 
         this.canvas = new Canvas('main-canvas');
         this.backgroundColor = '#f0f0f0';
         this.ribbon = new Ribbon(this);
 
-        this.topMenuBar = new TopMenuBar(this); // ADD THIS
+        this.topMenuBar = new TopMenuBar(this);
 
         const workspace = document.createElement('div');
-        workspace.id = 'workspace-container';
+        workspace.id = 'workspace-container'; // ID matched to CSS
         const canvasElement = this.canvas.canvas;
         canvasElement.parentNode.insertBefore(workspace, canvasElement);
         workspace.appendChild(canvasElement);
@@ -1237,9 +1206,9 @@ class Program{
 
 
         this.canvas.resize();
-    
+
         window.addEventListener('resize', () => {
-            if(this.canvas.resize()){
+            if (this.canvas.resize()) {
                 this.update();
                 this.draw();
             }
@@ -1247,8 +1216,6 @@ class Program{
 
         this.canvas.clear();
         this.canvas.initMouseListeners();
-
-
 
         let rect1 = new Rectangle(100, 100, 'red');
         rect1.setPosition(150, 150);
@@ -1258,12 +1225,9 @@ class Program{
         rect2.setPosition(400, 300);
         this.drawables.push(rect2);
 
-        this.context_menu= new ContextMenu(this.canvas,this.drawables);
+        this.context_menu = new ContextMenu(this.canvas, this.drawables);
         this.context_menu.build();
         this.context_menu.initListeners();
-
-        this.layersPanel.update();
-        
     }
 
     setFillColor(color) {
@@ -1287,8 +1251,8 @@ class Program{
         }
     }
 
-    setBackgroundColor(color){
-    this.backgroundColor = color;
+    setBackgroundColor(color) {
+        this.backgroundColor = color;
     }
     clearCanvas() {
         if (confirm('Are you sure you want to clear the canvas?')) {
@@ -1299,32 +1263,31 @@ class Program{
             console.log('Canvas cleared');
         }
     }
-saveAs(format) {
-    if (format === 'png' || format === 'jpg') {
-        const dataURL = this.canvas.canvas.toDataURL(`image/${format}`);
-        this.downloadURI(dataURL, `drawing.${format}`);
-    } 
-    else if (format === 'svg') {
-    
-        const width = this.canvas.canvas.width;
-        const height = this.canvas.canvas.height;
-        
-        let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
-        
-        svgContent += `<rect width="100%" height="100%" fill="${this.backgroundColor}" />`;
+    saveAs(format) {
+        if (format === 'png' || format === 'jpg') {
+            const dataURL = this.canvas.canvas.toDataURL(`image/${format}`);
+            this.downloadURI(dataURL, `drawing.${format}`);
+        } else if (format === 'svg') {
 
-        for (const drawable of this.drawables) {
-            if (typeof drawable.toSVG === 'function') {
-                svgContent += drawable.toSVG();
+            const width = this.canvas.canvas.width;
+            const height = this.canvas.canvas.height;
+
+            let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
+
+            svgContent += `<rect width="100%" height="100%" fill="${this.backgroundColor}" />`;
+
+            for (const drawable of this.drawables) {
+                if (typeof drawable.toSVG === 'function') {
+                    svgContent += drawable.toSVG();
+                }
             }
+            svgContent += `</svg>`;
+            const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+
+            this.downloadURI(url, 'drawing.svg');
         }
-        svgContent += `</svg>`;
-        const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        
-        this.downloadURI(url, 'drawing.svg');
     }
-}
     downloadURI(uri, name) {
         let link = document.createElement('a');
         link.download = name;
@@ -1334,54 +1297,51 @@ saveAs(format) {
         document.body.removeChild(link);
     }
 
-    run(){
+    run() {
         this.mainLoop();
     };
 
-    mainLoop(){
+    mainLoop() {
         this.update();
         this.draw();
 
         requestAnimationFrame(() => this.mainLoop());
     }
 
-    update(){
+    update() {
         const mouseX = this.canvas.mouseX;
         const mouseY = this.canvas.mouseY;
-        
-        if(this.canvas.isMouseDown){
+
+        if (this.canvas.isMouseDown) {
             this.updateMouseDown(mouseX, mouseY);
-            
-        }else{
-            this.updateMouseUp(mouseX,mouseY)
+
+        } else {
+            this.updateMouseUp(mouseX, mouseY)
             this.updateCursor(mouseX, mouseY);
         }
 
 
     }
 
-    updateMouseUp(mouseX, mouseY){
-        if(!this.isDragging){
+    updateMouseUp(mouseX, mouseY) {
+        if (!this.isDragging) {
             return;
         }
-        // if(this.dragTarget && !this.mouseMovedSinceDown){
-        //     this.handleClick(mouseX, mouseY);
-        // }
 
-        if(!this.mouseMovedSinceDown){
-            if(this.activeTool==='select'){
+        if (!this.mouseMovedSinceDown) {
+            if (this.activeTool === 'select') {
                 this.selectedObject = this.dragTarget;
 
-                if(this.selectedObject) {
-                    if(this.selectedObject.fillColor) {
+                if (this.selectedObject) {
+                    if (this.selectedObject.fillColor) {
                         this.ribbon.fillInput.value = this.selectedObject.fillColor;
                         this.currentFillColor = this.selectedObject.fillColor;
                     }
-                    if(this.selectedObject.strokeColor) {
+                    if (this.selectedObject.strokeColor) {
                         this.ribbon.strokeInput.value = this.selectedObject.strokeColor;
                         this.currentStrokeColor = this.selectedObject.strokeColor;
                     }
-                    if(this.selectedObject.lineWidth) {
+                    if (this.selectedObject.lineWidth) {
                         this.ribbon.widthInput.value = this.selectedObject.lineWidth;
                         this.currentLineWidth = this.selectedObject.lineWidth;
                     }
@@ -1391,15 +1351,14 @@ saveAs(format) {
         }
 
         const isShapeTool = (this.activeTool === 'rectangle' ||
-                     this.activeTool === 'line' ||
-                     this.activeTool === 'triangle' ||
-                     this.activeTool === 'ellipse' || 
-                     this.activeTool === 'circle');
+            this.activeTool === 'line' ||
+            this.activeTool === 'triangle' ||
+            this.activeTool === 'ellipse' ||
+            this.activeTool === 'circle');
 
         if (isShapeTool) {
-            // Check if it was a "click" (no real size)
-            if(this.dragTarget.width < this.clickThreshold || 
-            this.dragTarget.height < this.clickThreshold){
+            if (this.dragTarget.width < this.clickThreshold ||
+                this.dragTarget.height < this.clickThreshold) {
                 this.context_menu.deleteDrawable(this.dragTarget);
             } else {
                 this.selectedObject = this.dragTarget;
@@ -1407,14 +1366,14 @@ saveAs(format) {
             this.ribbon.setActiveTool('select');
         }
 
-        if(this.activeTool==='pen'){
-            if(this.dragTarget.points.length <2){
+        if (this.activeTool === 'pen') {
+            if (this.dragTarget.points.length < 2) {
                 this.context_menu.deleteDrawable(this.dragTarget);
-            }else{
+            } else {
                 let bounds = this.dragTarget.getBounds();
-                let centerX = (bounds.minX + bounds.maxX) /2;
-                let centerY = (bounds.minY + bounds.maxY) /2;
-                this.dragTarget.setPosition(centerX,centerY);
+                let centerX = (bounds.minX + bounds.maxX) / 2;
+                let centerY = (bounds.minY + bounds.maxY) / 2;
+                this.dragTarget.setPosition(centerX, centerY);
                 this.selectedObject = this.dragTarget;
             }
             this.ribbon.setActiveTool('select');
@@ -1425,17 +1384,16 @@ saveAs(format) {
         this.resizeHandle = null;
     }
 
-    updateMouseDown(mouseX, mouseY){
-        let deltaX = mouseX -  this.lastMouseX;
-        let deltaY = mouseY -  this.lastMouseY;
-        if(this.isDragging){
+    updateMouseDown(mouseX, mouseY) {
+        let deltaX = mouseX - this.lastMouseX;
+        let deltaY = mouseY - this.lastMouseY;
+        if (this.isDragging) {
 
-            // this.mouseMovedSinceDown = !this.mouseMovedSinceDown && (Math.abs(deltaX) > this.clickThreshold || Math.abs(deltaY) > this.clickThreshold);
-            if(!this.mouseMovedSinceDown){
+            if (!this.mouseMovedSinceDown) {
                 this.mouseMovedSinceDown = (Math.abs(deltaX) > this.clickThreshold || Math.abs(deltaY) > this.clickThreshold);
             }
 
-            if(this.dragTarget && this.mouseMovedSinceDown)
+            if (this.dragTarget && this.mouseMovedSinceDown)
                 this.handleDrag(deltaX, deltaY);
 
 
@@ -1448,38 +1406,37 @@ saveAs(format) {
         this.lastMouseX = mouseX;
         this.lastMouseY = mouseY;
         this.mouseMovedSinceDown = false;
-        // this.drawTarget = null;
         this.dragTarget = null;
         this.resizeHandle = null;
 
-        let randomColor = "#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+        let randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
 
-        switch(this.activeTool){
+        switch (this.activeTool) {
             case 'select':
-                if(this.selectedObject){
-                    let handle = this.selectedObject.getHandleAtPoint(mouseX,mouseY);
-                    if(handle){
+                if (this.selectedObject) {
+                    let handle = this.selectedObject.getHandleAtPoint(mouseX, mouseY);
+                    if (handle) {
                         this.dragTarget = this.selectedObject;
                         this.resizeHandle = handle;
-                        if(this.resizeHandle==='body'){
+                        if (this.resizeHandle === 'body') {
                             this.context_menu.bringToFront(this.dragTarget);
                         }
                         return;
                     }
                 }
 
-                for(let i = this.drawables.length-1;i>=0;i--){
+                for (let i = this.drawables.length - 1; i >= 0; i--) {
                     let drawable = this.drawables[i];
-                    let handle = drawable.getHandleAtPoint(mouseX,mouseY);
-                    if(!handle)continue;
+                    let handle = drawable.getHandleAtPoint(mouseX, mouseY);
+                    if (!handle) continue;
                     this.dragTarget = drawable;
                     this.resizeHandle = 'body';
                     this.context_menu.bringToFront(this.dragTarget);
                     break;
                 }
-                break 
+                break
 
-            
+
             case 'rectangle':
             case 'line':
             case 'triangle':
@@ -1489,24 +1446,24 @@ saveAs(format) {
                 this.dragStartY = mouseY;
                 let newShape;
 
-                if(this.activeTool === 'rectangle') 
-                    newShape = new Rectangle(0, 0, this.currentFillColor, this.currentStrokeColor, this.currentLineWidth);                
-                else if(this.activeTool === 'line') 
+                if (this.activeTool === 'rectangle')
+                    newShape = new Rectangle(0, 0, this.currentFillColor, this.currentStrokeColor, this.currentLineWidth);
+                else if (this.activeTool === 'line')
                     newShape = new Line(0, 0, this.currentStrokeColor, this.currentLineWidth);
-                else if(this.activeTool === 'triangle') 
+                else if (this.activeTool === 'triangle')
                     newShape = new Triangle(0, 0, this.currentFillColor, this.currentStrokeColor, this.currentLineWidth);
-                else if(this.activeTool === 'ellipse') 
+                else if (this.activeTool === 'ellipse')
                     newShape = new Ellipse(0, 0, this.currentFillColor, this.currentStrokeColor, this.currentLineWidth);
-                else if(this.activeTool === 'circle') 
+                else if (this.activeTool === 'circle')
                     newShape = new Circle(0, this.currentFillColor, this.currentStrokeColor, this.currentLineWidth);
-                
+
                 newShape.setPosition(mouseX, mouseY);
                 this.drawables.push(newShape);
                 this.dragTarget = newShape;
                 this.resizeHandle = 'draw-shape';
                 this.layersPanel.update();
                 break;
-            case 'pen':         
+            case 'pen':
                 let newPolyline = new Polyline(this.currentStrokeColor, this.currentLineWidth);
                 newPolyline.addPoint(mouseX, mouseY);
                 this.drawables.push(newPolyline);
@@ -1518,39 +1475,40 @@ saveAs(format) {
 
     }
 
-    handleDrag(deltaX, deltaY){
-        if(!this.dragTarget || !this.resizeHandle) 
+    handleDrag(deltaX, deltaY) {
+        if (!this.dragTarget || !this.resizeHandle)
             return;
 
 
         let target = this.dragTarget;
         const currentX = this.lastMouseX + deltaX;
         const currentY = this.lastMouseY + deltaY;
-        switch(this.resizeHandle){
-            case 'draw-shape': { 
-                const newWidth = currentX - this.dragStartX;
-                const newHeight = currentY - this.dragStartY;
-                const newCenterX = this.dragStartX + (newWidth / 2);
-                const newCenterY = this.dragStartY + (newHeight / 2);
+        switch (this.resizeHandle) {
+            case 'draw-shape':
+                {
+                    const newWidth = currentX - this.dragStartX;
+                    const newHeight = currentY - this.dragStartY;
+                    const newCenterX = this.dragStartX + (newWidth / 2);
+                    const newCenterY = this.dragStartY + (newHeight / 2);
 
-                if (target instanceof Circle) {
-                    const size = Math.max(Math.abs(newWidth), Math.abs(newHeight));
-                    target.width = size;
-                    target.height = size;
+                    if (target instanceof Circle) {
+                        const size = Math.max(Math.abs(newWidth), Math.abs(newHeight));
+                        target.width = size;
+                        target.height = size;
 
-                    const signX = newWidth < 0 ? -1 : 1;
-                    const signY = newHeight < 0 ? -1 : 1;
-                    target.position.x = this.dragStartX + (size * signX) / 2;
-                    target.position.y = this.dragStartY + (size * signY) / 2;
-                    
-                } else {
-                    target.width = Math.abs(newWidth);
-                    target.height = Math.abs(newHeight);
-                    target.position.x = newCenterX;
-                    target.position.y = newCenterY;
+                        const signX = newWidth < 0 ? -1 : 1;
+                        const signY = newHeight < 0 ? -1 : 1;
+                        target.position.x = this.dragStartX + (size * signX) / 2;
+                        target.position.y = this.dragStartY + (size * signY) / 2;
+
+                    } else {
+                        target.width = Math.abs(newWidth);
+                        target.height = Math.abs(newHeight);
+                        target.position.x = newCenterX;
+                        target.position.y = newCenterY;
+                    }
+                    break;
                 }
-                break;
-            }
             case 'draw-pen':
                 target.addPoint(currentX, currentY);
                 break;
@@ -1568,60 +1526,58 @@ saveAs(format) {
                 break;
             case 'left':
                 target.width -= deltaX
-                target.position.x += deltaX/2
+                target.position.x += deltaX / 2
                 break
             case 'right':
-                target.width+= deltaX
-                target.position.x +=deltaX/2;
+                target.width += deltaX
+                target.position.x += deltaX / 2;
                 break
             case 'top':
                 target.height -= deltaY
-                target.position.y += deltaY/2
+                target.position.y += deltaY / 2
                 break
             case 'bottom':
                 target.height += deltaY
-                target.position.y += deltaY/2
+                target.position.y += deltaY / 2
                 break
             case 'top-left':
                 target.width -= deltaX
                 target.height -= deltaY
-                target.position.x +=deltaX/2
-                target.position.y += deltaY/2
+                target.position.x += deltaX / 2
+                target.position.y += deltaY / 2
                 break
             case 'top-right':
                 target.width += deltaX
                 target.height -= deltaY
-                target.position.x +=deltaX/2
-                target.position.y += deltaY/2
+                target.position.x += deltaX / 2
+                target.position.y += deltaY / 2
                 break
 
             case 'bottom-left':
                 target.width -= deltaX
                 target.height += deltaY
-                target.position.x +=deltaX/2
-                target.position.y += deltaY/2
+                target.position.x += deltaX / 2
+                target.position.y += deltaY / 2
                 break
 
             case 'bottom-right':
                 target.width += deltaX
                 target.height += deltaY
-                target.position.x +=deltaX/2
-                target.position.y += deltaY/2
+                target.position.x += deltaX / 2
+                target.position.y += deltaY / 2
                 break
         }
 
     }
 
-    handleClick(mouseX, mouseY){
-        // if(this.activeTool==='select'){
-        //     console.log(`Clicked on ${this.dragTarget.color} rectangle`)
-        // }
+    handleClick(mouseX, mouseY) {
+
     }
 
-    updateCursor(mouseX, mouseY){
-        if(this.isDragging)return;
+    updateCursor(mouseX, mouseY) {
+        if (this.isDragging) return;
         let cursor = 'default'
-        
+
         switch (this.activeTool) {
             case 'select':
                 if (this.selectedObject) {
@@ -1630,7 +1586,7 @@ saveAs(format) {
                 }
 
                 if (cursor === null || cursor === 'default') {
-                    cursor = 'default'; // Reset
+                    cursor = 'default';
                     for (let i = this.drawables.length - 1; i >= 0; i--) {
                         const handle = this.drawables[i].getHandleAtPoint(mouseX, mouseY);
                         if (handle === 'body') {
@@ -1640,22 +1596,22 @@ saveAs(format) {
                     }
                 }
                 break;
-            
+
             case 'rectangle':
             case 'line':
             case 'triangle':
             case 'ellipse':
-            case 'circle': 
+            case 'circle':
             case 'pen':
                 cursor = 'crosshair';
                 break;
         }
-        this.canvas.canvas.style.cursor=cursor
+        this.canvas.canvas.style.cursor = cursor
 
     }
 
-   
-    getCursorForHandle(handle){
+
+    getCursorForHandle(handle) {
         switch (handle) {
             case 'body':
                 return 'move';
@@ -1677,15 +1633,14 @@ saveAs(format) {
     }
 
 
-    draw(){
-        // this.canvas.clear();
+    draw() {
         this.canvas.ctx.fillStyle = this.backgroundColor;
         this.canvas.ctx.fillRect(0, 0, this.canvas.canvas.width, this.canvas.canvas.height);
-        for(const drawable of this.drawables){
+        for (const drawable of this.drawables) {
             drawable.draw(this.canvas.ctx);
         }
 
-       if(this.selectedObject && this.activeTool==='select'){
+        if (this.selectedObject && this.activeTool === 'select') {
             if (typeof this.selectedObject.drawHandles === 'function') {
                 this.selectedObject.drawHandles(this.canvas.ctx);
             }
@@ -1698,5 +1653,5 @@ saveAs(format) {
 window.addEventListener('load', () => {
     window.program = new Program();
     console.log('Program initialized');
-    program.run();  
+    program.run();
 });
