@@ -679,15 +679,14 @@ class ContextMenu{
             program.dragTarget = null;
         }
         
-        // VVV ADD THIS LINE VVV
         if (program.selectedObject === drawableToDelete) {
             program.selectedObject = null;
         }
-        // ^^^ END OF FIX ^^^
 
         if (this.rightClickedTarget === drawableToDelete) {
             this.rightClickedTarget = null;
         }
+        program.layersPanel.update();
     }
 
     bringToFront(drawableToMove) {
@@ -1079,7 +1078,118 @@ class Canvas{
 
 }
 
+class LayersPanel {
+    constructor(program) {
+        this.program = program;
+        this.container = null;
+        this.listElement = null;
+        this.build();
+    }
 
+    build() {
+        
+        this.container = document.createElement('div');
+        this.container.id = 'layers-panel';
+        
+        const header = document.createElement('div');
+        header.id = 'layers-header';
+        header.textContent = 'Layers / Figures';
+        
+        this.listElement = document.createElement('ul');
+        this.listElement.id = 'layers-list';
+        
+        this.container.appendChild(header);
+        this.container.appendChild(this.listElement);
+    }
+
+    update() {
+        this.listElement.innerHTML = '';
+        
+        for (let i = this.program.drawables.length - 1; i >= 0; i--) {
+            const drawable = this.program.drawables[i];
+            const li = document.createElement('li');
+            li.className = 'layer-item';
+
+            if (this.program.selectedObject === drawable) {
+                li.classList.add('active');
+            }
+
+            li.addEventListener('click', () => {
+                this.program.selectedObject = drawable;
+                this.program.ribbon.setActiveTool('select');
+                this.update();
+                this.program.draw();
+            });
+
+            const preview = document.createElement('span');
+            preview.className = 'layer-preview';
+            let color = drawable.fillColor || drawable.strokeColor || '#000';
+            if (color === 'transparent') color = drawable.strokeColor;
+            preview.style.backgroundColor = color;
+
+            const nameSpan = this._createEditableName(drawable, i, li);
+
+            const delBtn = document.createElement('button');
+            delBtn.className = 'layer-delete';
+            delBtn.innerHTML = '&times;';
+            delBtn.title = 'Delete Figure';
+            
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.program.context_menu.deleteDrawable(drawable);
+            });
+
+            li.appendChild(preview);
+            li.appendChild(nameSpan);
+            li.appendChild(delBtn);
+            
+            this.listElement.appendChild(li);
+        }
+    }
+    _createEditableName(drawable, index, parentLi) {
+        const span = document.createElement('span');
+        span.textContent = drawable.name || `${drawable.constructor.name} ${index + 1}`;
+        span.style.flexGrow = '1';
+        span.style.paddingLeft = '5px';
+
+        span.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.program.selectedObject = drawable;
+            this.program.ribbon.setActiveTool('select');
+            
+            document.querySelectorAll('.layer-item').forEach(item => item.classList.remove('active'));
+            parentLi.classList.add('active');
+            this.program.draw();
+        });
+
+        span.addEventListener('dblclick', (e) => {
+            e.stopPropagation();
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = span.textContent;
+            input.style.width = '100px';
+            input.style.fontFamily = 'inherit';
+
+            const commitChange = () => {
+                const val = input.value.trim();
+                if (val) drawable.name = val;
+                this.update();
+            };
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') commitChange();
+            });
+
+            input.addEventListener('blur', commitChange);
+
+            parentLi.replaceChild(input, span);
+            input.focus();
+        });
+
+        return span;
+    }
+}
 class Program{
 
     drawables = [];
@@ -1116,6 +1226,16 @@ class Program{
 
         this.topMenuBar = new TopMenuBar(this); // ADD THIS
 
+        const workspace = document.createElement('div');
+        workspace.id = 'workspace-container';
+        const canvasElement = this.canvas.canvas;
+        canvasElement.parentNode.insertBefore(workspace, canvasElement);
+        workspace.appendChild(canvasElement);
+
+        this.layersPanel = new LayersPanel(this);
+        workspace.appendChild(this.layersPanel.container);
+
+
         this.canvas.resize();
     
         window.addEventListener('resize', () => {
@@ -1142,7 +1262,7 @@ class Program{
         this.context_menu.build();
         this.context_menu.initListeners();
 
-        
+        this.layersPanel.update();
         
     }
 
@@ -1175,6 +1295,7 @@ class Program{
             this.drawables = [];
             this.selectedObject = null;
             this.dragTarget = null;
+            this.layersPanel.update();
             console.log('Canvas cleared');
         }
     }
@@ -1265,6 +1386,7 @@ saveAs(format) {
                         this.currentLineWidth = this.selectedObject.lineWidth;
                     }
                 }
+                this.layersPanel.update();
             }
         }
 
@@ -1382,6 +1504,7 @@ saveAs(format) {
                 this.drawables.push(newShape);
                 this.dragTarget = newShape;
                 this.resizeHandle = 'draw-shape';
+                this.layersPanel.update();
                 break;
             case 'pen':         
                 let newPolyline = new Polyline(this.currentStrokeColor, this.currentLineWidth);
@@ -1389,6 +1512,7 @@ saveAs(format) {
                 this.drawables.push(newPolyline);
                 this.dragTarget = newPolyline;
                 this.resizeHandle = 'draw-pen';
+                this.layersPanel.update();
                 break;
         }
 
