@@ -193,6 +193,10 @@ class HandleDrawable extends Drawable{
 
         return null;
     }
+
+    toSVG() {
+        return '';
+    }
 }
 
 class Rectangle extends HandleDrawable{
@@ -228,6 +232,23 @@ class Rectangle extends HandleDrawable{
         
         ctx.restore();
     }
+
+    toSVG() {
+        const degree = this.rotation * (180 / Math.PI);
+        
+        return `
+        <g transform="translate(${this.position.x}, ${this.position.y}) rotate(${degree}) scale(${this.scale.x}, ${this.scale.y})">
+            <rect 
+                x="${-this.width / 2}" 
+                y="${-this.height / 2}" 
+                width="${this.width}" 
+                height="${this.height}" 
+                fill="${this.fillColor}" 
+                stroke="${this.strokeColor}" 
+                stroke-width="${this.lineWidth}"
+            />
+        </g>`;
+    }
    
 }
 
@@ -256,6 +277,20 @@ class Line extends HandleDrawable{
         ctx.stroke();
         
         ctx.restore();
+    }
+    toSVG() {
+        const degree = this.rotation * (180 / Math.PI);
+        
+        return `
+        <g transform="translate(${this.position.x}, ${this.position.y}) rotate(${degree}) scale(${this.scale.x}, ${this.scale.y})">
+            <line 
+                x1="${-this.width / 2}" y1="${-this.height / 2}" 
+                x2="${this.width / 2}" y2="${this.height / 2}" 
+                stroke="${this.strokeColor}" 
+                stroke-width="${this.lineWidth}" 
+                stroke-linecap="round"
+            />
+        </g>`;
     }
 }
 
@@ -291,6 +326,23 @@ class Triangle extends HandleDrawable{
         }
         
         ctx.restore();
+    }
+    toSVG() {
+        const degree = this.rotation * (180 / Math.PI);
+        
+        const p1 = `0,${-this.height / 2}`;             // Top
+        const p2 = `${this.width / 2},${this.height / 2}`;   // Bottom Right
+        const p3 = `${-this.width / 2},${this.height / 2}`;  // Bottom Left
+
+        return `
+        <g transform="translate(${this.position.x}, ${this.position.y}) rotate(${degree}) scale(${this.scale.x}, ${this.scale.y})">
+            <polygon 
+                points="${p1} ${p2} ${p3}" 
+                fill="${this.fillColor}" 
+                stroke="${this.strokeColor}" 
+                stroke-width="${this.lineWidth}"
+            />
+        </g>`;
     }
 }
 
@@ -346,9 +398,7 @@ class Polyline extends Drawable{
     }
 
     isPointInside(x, y) {
-        // Use bounds for simple selection
         const bounds = this.getBounds();
-        // Add a small buffer for easier clicking
         const buffer = 5; 
         
         return (x >= bounds.minX - buffer && x <= bounds.maxX + buffer &&
@@ -356,7 +406,6 @@ class Polyline extends Drawable{
     }
 
     getHandleAtPoint(x, y) {
-        // Polylines can be moved (body) but not resized with handles
         if (this.isPointInside(x, y)) {
             return 'body';
         }
@@ -399,6 +448,22 @@ class Polyline extends Drawable{
         ctx.restore();
     }
 
+    toSVG() {
+        if (this.points.length < 2) return '';
+
+        const pointsString = this.points.map(p => `${p.x},${p.y}`).join(' ');
+
+        return `
+            <polyline 
+                points="${pointsString}" 
+                fill="none" 
+                stroke="${this.strokeColor}" 
+                stroke-width="${this.lineWidth}" 
+                stroke-linecap="round" 
+                stroke-linejoin="round"
+            />`;
+    }
+
 }
 
 class Ellipse extends HandleDrawable {
@@ -430,6 +495,23 @@ class Ellipse extends HandleDrawable {
         }
 
         ctx.restore();
+    }
+
+    toSVG() {
+        const degree = this.rotation * (180 / Math.PI);
+        // rx and ry are radius (half width/height)
+        return `
+        <g transform="translate(${this.position.x}, ${this.position.y}) rotate(${degree}) scale(${this.scale.x}, ${this.scale.y})">
+            <ellipse 
+                cx="0" 
+                cy="0" 
+                rx="${Math.abs(this.width / 2)}" 
+                ry="${Math.abs(this.height / 2)}" 
+                fill="${this.fillColor}" 
+                stroke="${this.strokeColor}" 
+                stroke-width="${this.lineWidth}"
+            />
+        </g>`;
     }
 }
 
@@ -674,15 +756,15 @@ class TopMenuBar {
             });
         });
 
-        // Handle nested dropdowns
+
         this.element.querySelectorAll('.dropdown .dropdown > span').forEach(span => {
             span.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent parent menu from closing
+                e.stopPropagation();
                 span.nextElementSibling.classList.toggle('show');
             });
         });
 
-        // Handle actions
+    
         this.element.querySelector('[data-action="new"]').addEventListener('click', () => {
             this.program.clearCanvas();
         });
@@ -696,7 +778,6 @@ class TopMenuBar {
             this.program.saveAs('svg');
         });
 
-        // Close menus when clicking elsewhere
         window.addEventListener('click', (e) => {
             if (!this.element.contains(e.target)) {
                 this.element.querySelectorAll('.dropdown-content').forEach(dc => {
@@ -1097,17 +1178,32 @@ class Program{
             console.log('Canvas cleared');
         }
     }
-    saveAs(format) {
-        if (format === 'png' || format === 'jpg') {
-            const dataURL = this.canvas.canvas.toDataURL(`image/${format}`);
-            this.downloadURI(dataURL, `drawing.${format}`);
-        } else if (format === 'svg') {
-            // SVG export is very complex and requires a separate library
-            // or a function to convert all 'drawables' to SVG path data.
-            console.warn('SVG export is not yet implemented.');
-            alert('SVG export is not yet implemented. This feature requires building an SVG string from all drawn objects.');
+saveAs(format) {
+    if (format === 'png' || format === 'jpg') {
+        const dataURL = this.canvas.canvas.toDataURL(`image/${format}`);
+        this.downloadURI(dataURL, `drawing.${format}`);
+    } 
+    else if (format === 'svg') {
+    
+        const width = this.canvas.canvas.width;
+        const height = this.canvas.canvas.height;
+        
+        let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
+        
+        svgContent += `<rect width="100%" height="100%" fill="${this.backgroundColor}" />`;
+
+        for (const drawable of this.drawables) {
+            if (typeof drawable.toSVG === 'function') {
+                svgContent += drawable.toSVG();
+            }
         }
+        svgContent += `</svg>`;
+        const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        
+        this.downloadURI(url, 'drawing.svg');
     }
+}
     downloadURI(uri, name) {
         let link = document.createElement('a');
         link.download = name;
@@ -1466,7 +1562,6 @@ class Program{
         }
 
        if(this.selectedObject && this.activeTool==='select'){
-            // Only HandleDrawable and its children have drawHandles
             if (typeof this.selectedObject.drawHandles === 'function') {
                 this.selectedObject.drawHandles(this.canvas.ctx);
             }
