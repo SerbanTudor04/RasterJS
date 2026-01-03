@@ -23,6 +23,13 @@ class Statics{
     </svg>`
 
     static CARET_DOWN_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>`;
+    static ELLIPSE_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+    <ellipse cx="12" cy="12" rx="10" ry="6"/>
+    </svg>`;
+
+    static CIRCLE_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+    <circle cx="12" cy="12" r="9"/>
+    </svg>`;
 }
 
 class Drawable{
@@ -345,6 +352,36 @@ class Polyline extends Drawable{
 
 }
 
+class Ellipse extends HandleDrawable {
+    handleSize = 8;
+    constructor(width, height, color) {
+        super();
+        this.width = width;
+        this.height = height;
+        this.color = color;
+    }
+
+    draw(ctx) {
+        ctx.save();
+        ctx.translate(this.position.x, this.position.y);
+        ctx.rotate(this.rotation);
+        ctx.scale(this.scale.x, this.scale.y);
+
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, Math.abs(this.width / 2), Math.abs(this.height / 2), 0, 0, 2 * Math.PI);
+        ctx.fill();
+
+        ctx.restore();
+    }
+}
+
+class Circle extends Ellipse {
+    constructor(diameter, color) {
+        super(diameter, diameter, color);
+    }
+}
+
 class ContextMenuItem{
     context_menu=null;
     name = null;
@@ -630,15 +667,12 @@ class Ribbon {
         let toolGroup = document.createElement('div');
         toolGroup.classList.add('tool-group');
 
-        // 1. Select Tool
         this.toolButtons['select'] = this._createButton('tool-select', 'Select', Statics.SELECT_ICON);
         this.toolButtons['select'].addEventListener('click', () => this.setActiveTool('select'));
         toolGroup.appendChild(this.toolButtons['select']);
 
-        // 2. Draw Dropdown
         this._createDrawDropdown(toolGroup);
 
-        // 3. Pen Tool
         this.toolButtons['pen'] = this._createButton('tool-pen', 'Pen', Statics.PEN_ICON);
         this.toolButtons['pen'].addEventListener('click', () => this.setActiveTool('pen'));
         toolGroup.appendChild(this.toolButtons['pen']);
@@ -678,6 +712,8 @@ class Ribbon {
             { name: 'rectangle', title: 'Rectangle', icon: Statics.RECT_ICON },
             { name: 'line', title: 'Line', icon: Statics.LINE_ICON },
             { name: 'triangle', title: 'Triangle', icon: Statics.TRIANGLE_ICON },
+            { name: 'ellipse', title: 'Ellipse', icon: Statics.ELLIPSE_ICON },
+            { name: 'circle', title: 'Circle', icon: Statics.CIRCLE_ICON },
         ];
 
         for (let tool of drawTools) {
@@ -715,7 +751,7 @@ class Ribbon {
         this.toolButtons['select'].classList.toggle('active', toolName === 'select');
         this.toolButtons['pen'].classList.toggle('active', toolName === 'pen');
 
-        const isDrawTool = ['rectangle', 'line', 'triangle'].includes(toolName);
+        const isDrawTool = ['rectangle', 'line', 'triangle', 'ellipse', 'circle'].includes(toolName);
         this.mainDrawButton.classList.toggle('active', isDrawTool);
         
         // Update program's active tool
@@ -920,9 +956,11 @@ class Program{
             }
         }
 
-        const isShapeTool = (this.activeTool==='rectangle' || 
-                         this.activeTool==='line' || 
-                         this.activeTool==='triangle');
+        const isShapeTool = (this.activeTool === 'rectangle' ||
+                     this.activeTool === 'line' ||
+                     this.activeTool === 'triangle' ||
+                     this.activeTool === 'ellipse' || 
+                     this.activeTool === 'circle');
 
         if (isShapeTool) {
             // Check if it was a "click" (no real size)
@@ -1011,6 +1049,8 @@ class Program{
             case 'rectangle':
             case 'line':
             case 'triangle':
+            case 'ellipse':
+            case 'circle':
                 this.dragStartX = mouseX;
                 this.dragStartY = mouseY;
 
@@ -1023,6 +1063,10 @@ class Program{
                 }else if(this.activeTool==='triangle'){
                     newShape = new Triangle(0,0,randomColor);
                 }
+                else if(this.activeTool === 'ellipse') 
+                    newShape = new Ellipse(0, 0, randomColor);
+                else if(this.activeTool === 'circle') 
+                    newShape = new Circle(0, randomColor);     
                 
                 newShape.setPosition(mouseX,mouseY);
                 this.drawables.push(newShape);
@@ -1049,31 +1093,41 @@ class Program{
         const currentX = this.lastMouseX + deltaX;
         const currentY = this.lastMouseY + deltaY;
         switch(this.resizeHandle){
-            case 'draw-shape':{ // Used for rect, line, triangle
+            case 'draw-shape': { 
                 const newWidth = currentX - this.dragStartX;
                 const newHeight = currentY - this.dragStartY;
                 const newCenterX = this.dragStartX + (newWidth / 2);
                 const newCenterY = this.dragStartY + (newHeight / 2);
 
-                target.width = Math.abs(newWidth);
-                target.height = Math.abs(newHeight);
-                target.position.x = newCenterX;
-                target.position.y = newCenterY;
+                if (target instanceof Circle) {
+                    const size = Math.max(Math.abs(newWidth), Math.abs(newHeight));
+                    target.width = size;
+                    target.height = size;
+
+                    const signX = newWidth < 0 ? -1 : 1;
+                    const signY = newHeight < 0 ? -1 : 1;
+                    target.position.x = this.dragStartX + (size * signX) / 2;
+                    target.position.y = this.dragStartY + (size * signY) / 2;
+                    
+                } else {
+                    target.width = Math.abs(newWidth);
+                    target.height = Math.abs(newHeight);
+                    target.position.x = newCenterX;
+                    target.position.y = newCenterY;
+                }
                 break;
             }
             case 'draw-pen':
                 target.addPoint(currentX, currentY);
                 break;
             case 'body':
-                // For Polyline, which has no 'position'
+
                 if (target instanceof Polyline) {
-                    // Move all points by delta
                     for (const point of target.points) {
                         point.x += deltaX;
                         point.y += deltaY;
                     }
                 } else {
-                    // For all other shapes
                     target.position.x += deltaX;
                     target.position.y += deltaY;
                 }
@@ -1156,6 +1210,8 @@ class Program{
             case 'rectangle':
             case 'line':
             case 'triangle':
+            case 'ellipse':
+            case 'circle': 
             case 'pen':
                 cursor = 'crosshair';
                 break;
