@@ -73,7 +73,9 @@ class HandleDrawable extends Drawable{
         super();
         this.width=0;
         this.height=0;
-        this.color='black';
+        this.fillColor = '#ffffff'; 
+        this.strokeColor = '#000000';
+        this.lineWidth = 2;
         this.handleSize=8;
     }
 
@@ -196,11 +198,13 @@ class HandleDrawable extends Drawable{
 class Rectangle extends HandleDrawable{
     handleSize = 8;
 
-    constructor(width, height, color){
+    constructor(width, height, fillColor, strokeColor, lineWidth){
         super();
         this.width = width;
         this.height = height;
-        this.color = color;
+        this.fillColor = fillColor;
+        this.strokeColor = strokeColor;
+        this.lineWidth = lineWidth;
     }
     
 
@@ -210,8 +214,17 @@ class Rectangle extends HandleDrawable{
         ctx.rotate(this.rotation);
         ctx.scale(this.scale.x, this.scale.y);
         
-        ctx.fillStyle = this.color;
+        // fill
+        ctx.fillStyle = this.fillColor;
         ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+        
+        // border
+        // @Serbantudor04: only draw stroke if lineWidth > 0
+        if(this.lineWidth > 0){
+            ctx.strokeStyle = this.strokeColor;
+            ctx.lineWidth = this.lineWidth;
+            ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
+        }
         
         ctx.restore();
     }
@@ -219,21 +232,24 @@ class Rectangle extends HandleDrawable{
 }
 
 class Line extends HandleDrawable{
-    constructor(width, height, color){
+    constructor(width, height, strokeColor, lineWidth){
         super();
         this.width = width;
         this.height = height;
-        this.color = color;
+        this.strokeColor = strokeColor; //@serbantudor23: lines don t have fill
+        this.lineWidth = lineWidth;
+        this.fillColor = 'transparent'; //@serbantudor23: no color for inner part
     }
 
-    draw(ctx){
+    draw(ctx) {
         ctx.save();
         ctx.translate(this.position.x, this.position.y);
         ctx.rotate(this.rotation);
         ctx.scale(this.scale.x, this.scale.y);
         
-        ctx.strokeStyle = this.color;
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = this.strokeColor;
+        ctx.lineWidth = this.lineWidth;
+        ctx.lineCap = 'round'; 
         ctx.beginPath();
         ctx.moveTo(-this.width / 2, -this.height / 2);
         ctx.lineTo(this.width / 2, this.height / 2);
@@ -244,11 +260,13 @@ class Line extends HandleDrawable{
 }
 
 class Triangle extends HandleDrawable{
-    constructor(width, height, color){
+    constructor(width, height, fillColor, strokeColor, lineWidth){
         super();
         this.width = width;
         this.height = height;
-        this.color = color;
+        this.fillColor = fillColor;
+        this.strokeColor = strokeColor;
+        this.lineWidth = lineWidth;
     }
     
     draw(ctx){
@@ -257,24 +275,32 @@ class Triangle extends HandleDrawable{
         ctx.rotate(this.rotation);
         ctx.scale(this.scale.x, this.scale.y);
         
-        ctx.fillStyle = this.color;
         ctx.beginPath();
-        // Draw an isosceles triangle
-        ctx.moveTo(0, -this.height / 2); // Top point
-        ctx.lineTo(this.width / 2, this.height / 2); // Bottom-right
-        ctx.lineTo(-this.width / 2, this.height / 2); // Bottom-left
+        ctx.moveTo(0, -this.height / 2); // Top
+        ctx.lineTo(this.width / 2, this.height / 2); // Bottom Right
+        ctx.lineTo(-this.width / 2, this.height / 2); // Bottom Left
         ctx.closePath();
+
+        ctx.fillStyle = this.fillColor;
         ctx.fill();
+
+        if(this.lineWidth > 0){
+            ctx.lineWidth = this.lineWidth;
+            ctx.strokeStyle = this.strokeColor;
+            ctx.stroke();
+        }
         
         ctx.restore();
     }
 }
 
 class Polyline extends Drawable{
-    constructor(color){
+    constructor(strokeColor, lineWidth){
         super();
         this.points = [];
-        this.color = color;
+        this.strokeColor = strokeColor;
+        this.lineWidth = lineWidth;
+        this.fillColor = 'transparent'; 
     }
     addPoint(x, y){
         this.points.push({ x: x, y: y });
@@ -284,8 +310,10 @@ class Polyline extends Drawable{
         if (this.points.length < 2) return;
 
         ctx.save();
-        ctx.strokeStyle = this.color;
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = this.strokeColor;
+        ctx.lineWidth = this.lineWidth;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
         ctx.beginPath();
         
         ctx.moveTo(this.points[0].x, this.points[0].y);
@@ -375,31 +403,39 @@ class Polyline extends Drawable{
 
 class Ellipse extends HandleDrawable {
     handleSize = 8;
-    constructor(width, height, color) {
+    constructor(width, height, fillColor, strokeColor, lineWidth) {
         super();
         this.width = width;
         this.height = height;
-        this.color = color;
+        this.fillColor = fillColor;
+        this.strokeColor = strokeColor;
+        this.lineWidth = lineWidth;
     }
-
     draw(ctx) {
         ctx.save();
         ctx.translate(this.position.x, this.position.y);
         ctx.rotate(this.rotation);
         ctx.scale(this.scale.x, this.scale.y);
 
-        ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.ellipse(0, 0, Math.abs(this.width / 2), Math.abs(this.height / 2), 0, 0, 2 * Math.PI);
+        
+        ctx.fillStyle = this.fillColor;
         ctx.fill();
+
+        if(this.lineWidth > 0){
+            ctx.lineWidth = this.lineWidth;
+            ctx.strokeStyle = this.strokeColor;
+            ctx.stroke();
+        }
 
         ctx.restore();
     }
 }
 
 class Circle extends Ellipse {
-    constructor(diameter, color) {
-        super(diameter, diameter, color);
+    constructor(diameter, fillColor, strokeColor, lineWidth) {
+        super(diameter, diameter, fillColor, strokeColor, lineWidth);
     }
 }
 
@@ -730,6 +766,89 @@ class Ribbon {
     bgGroup.appendChild(bgInput);
     this.element.appendChild(bgGroup);
 
+    let propGroup = document.createElement('div');
+    propGroup.classList.add('tool-group');
+    propGroup.style.display = 'flex';
+    propGroup.style.alignItems = 'center';
+    propGroup.style.padding = '0 5px';
+    propGroup.style.gap = '8px';
+
+    // 1. FILL Color
+    let fillContainer = document.createElement('div');
+    fillContainer.style.display = 'flex';
+    fillContainer.style.alignItems = 'center';
+    
+    let fillLabel = document.createElement('span');
+    fillLabel.textContent = 'Fill:';
+    fillLabel.style.fontSize = '12px';
+    fillLabel.style.marginRight = '3px';
+
+    this.fillInput = document.createElement('input'); 
+    this.fillInput.type = 'color';
+    this.fillInput.value = '#ff0000'; // Default
+    this.fillInput.style.border = 'none';
+    this.fillInput.style.width = '25px';
+    this.fillInput.style.height = '25px';
+    this.fillInput.style.cursor = 'pointer';
+
+    this.fillInput.addEventListener('input', (e) => {
+        this.program.setFillColor(e.target.value);
+    });
+    fillContainer.appendChild(fillLabel);
+    fillContainer.appendChild(this.fillInput);
+
+    let strokeContainer = document.createElement('div');
+    strokeContainer.style.display = 'flex';
+    strokeContainer.style.alignItems = 'center';
+
+    let strokeLabel = document.createElement('span');
+    strokeLabel.textContent = 'Stroke:';
+    strokeLabel.style.fontSize = '12px';
+    strokeLabel.style.marginRight = '3px';
+
+    this.strokeInput = document.createElement('input'); 
+    this.strokeInput.type = 'color';
+    this.strokeInput.value = '#000000'; 
+    this.strokeInput.style.border = 'none';
+    this.strokeInput.style.width = '25px';
+    this.strokeInput.style.height = '25px';
+    this.strokeInput.style.cursor = 'pointer';
+
+    this.strokeInput.addEventListener('input', (e) => {
+        this.program.setStrokeColor(e.target.value);
+    });
+    strokeContainer.appendChild(strokeLabel);
+    strokeContainer.appendChild(this.strokeInput);
+
+    let widthContainer = document.createElement('div');
+    widthContainer.style.display = 'flex';
+    widthContainer.style.alignItems = 'center';
+
+    let widthLabel = document.createElement('span');
+    widthLabel.textContent = 'W:';
+    widthLabel.style.fontSize = '12px';
+    widthLabel.style.marginRight = '3px';
+
+    this.widthInput = document.createElement('input'); 
+    this.widthInput.type = 'number';
+    this.widthInput.min = '0';
+    this.widthInput.max = '50';
+    this.widthInput.value = '2';
+    this.widthInput.style.width = '40px';
+    this.widthInput.style.padding = '2px';
+
+    this.widthInput.addEventListener('input', (e) => {
+        this.program.setDrawWidth(e.target.value);
+    });
+    widthContainer.appendChild(widthLabel);
+    widthContainer.appendChild(this.widthInput);
+
+    propGroup.appendChild(fillContainer);
+    propGroup.appendChild(strokeContainer);
+    propGroup.appendChild(widthContainer);
+    
+    this.element.appendChild(propGroup);
+
     document.body.prepend(this.element);
     this.setActiveTool('select');
 
@@ -906,6 +1025,9 @@ class Program{
     selectedObject = null;
 
     constructor(){
+        this.currentFillColor = '#ff0000'; // default color
+        this.currentStrokeColor = '#000000'; // default stroke color
+        this.currentLineWidth = 2;         // default width
 
         this.canvas = new Canvas('main-canvas');
         this.backgroundColor = '#f0f0f0';
@@ -941,6 +1063,27 @@ class Program{
 
         
         
+    }
+
+    setFillColor(color) {
+        this.currentFillColor = color;
+        if (this.selectedObject && this.selectedObject.fillColor !== undefined) {
+            this.selectedObject.fillColor = color;
+        }
+    }
+
+    setStrokeColor(color) {
+        this.currentStrokeColor = color;
+        if (this.selectedObject) {
+            this.selectedObject.strokeColor = color;
+        }
+    }
+
+    setDrawWidth(width) {
+        this.currentLineWidth = parseInt(width);
+        if (this.selectedObject) {
+            this.selectedObject.lineWidth = this.currentLineWidth;
+        }
     }
 
     setBackgroundColor(color){
@@ -1011,6 +1154,21 @@ class Program{
         if(!this.mouseMovedSinceDown){
             if(this.activeTool==='select'){
                 this.selectedObject = this.dragTarget;
+
+                if(this.selectedObject) {
+                    if(this.selectedObject.fillColor) {
+                        this.ribbon.fillInput.value = this.selectedObject.fillColor;
+                        this.currentFillColor = this.selectedObject.fillColor;
+                    }
+                    if(this.selectedObject.strokeColor) {
+                        this.ribbon.strokeInput.value = this.selectedObject.strokeColor;
+                        this.currentStrokeColor = this.selectedObject.strokeColor;
+                    }
+                    if(this.selectedObject.lineWidth) {
+                        this.ribbon.widthInput.value = this.selectedObject.lineWidth;
+                        this.currentLineWidth = this.selectedObject.lineWidth;
+                    }
+                }
             }
         }
 
@@ -1111,29 +1269,27 @@ class Program{
             case 'circle':
                 this.dragStartX = mouseX;
                 this.dragStartY = mouseY;
-
                 let newShape;
 
-                if(this.activeTool==='rectangle'){
-                    newShape = new Rectangle(0,0,randomColor);
-                }else if(this.activeTool==='line'){
-                    newShape = new Line(0,0,randomColor);
-                }else if(this.activeTool==='triangle'){
-                    newShape = new Triangle(0,0,randomColor);
-                }
+                if(this.activeTool === 'rectangle') 
+                    newShape = new Rectangle(0, 0, this.currentFillColor, this.currentStrokeColor, this.currentLineWidth);                
+                else if(this.activeTool === 'line') 
+                    newShape = new Line(0, 0, this.currentStrokeColor, this.currentLineWidth);
+                else if(this.activeTool === 'triangle') 
+                    newShape = new Triangle(0, 0, this.currentFillColor, this.currentStrokeColor, this.currentLineWidth);
                 else if(this.activeTool === 'ellipse') 
-                    newShape = new Ellipse(0, 0, randomColor);
+                    newShape = new Ellipse(0, 0, this.currentFillColor, this.currentStrokeColor, this.currentLineWidth);
                 else if(this.activeTool === 'circle') 
-                    newShape = new Circle(0, randomColor);     
+                    newShape = new Circle(0, this.currentFillColor, this.currentStrokeColor, this.currentLineWidth);
                 
-                newShape.setPosition(mouseX,mouseY);
+                newShape.setPosition(mouseX, mouseY);
                 this.drawables.push(newShape);
                 this.dragTarget = newShape;
                 this.resizeHandle = 'draw-shape';
                 break;
-            case 'pen':
-                let newPolyline = new Polyline(randomColor);
-                newPolyline.addPoint(mouseX,mouseY);
+            case 'pen':         
+                let newPolyline = new Polyline(this.currentStrokeColor, this.currentLineWidth);
+                newPolyline.addPoint(mouseX, mouseY);
                 this.drawables.push(newPolyline);
                 this.dragTarget = newPolyline;
                 this.resizeHandle = 'draw-pen';
