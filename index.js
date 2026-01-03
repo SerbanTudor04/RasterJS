@@ -985,7 +985,7 @@ class Ribbon {
         parentGroup.appendChild(drawGroup);
     }
 
-_createButton(id, title, iconPath) {
+    _createButton(id, title, iconPath) {
         let button = document.createElement('button');
         button.id = id;
         button.innerHTML = `<img src="${iconPath}" class="icon-img" alt="${title}" />`;
