@@ -1,3 +1,45 @@
+/*
+ * RASTERJS SOURCE-AVAILABLE LICENSE
+ * * Copyright (c) 2025-2026 Serban Tudor Gabriel
+ * Repository: https://github.com/SerbanTudor04/RasterJS
+ * Last Updated: 03-01-2026
+ *
+ * TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+ *
+ * 1. DEFINITIONS
+ * "Software" refers to the code and documentation files associated with the RasterJS repository.
+ * "Author" refers to Serban Tudor Gabriel.
+ *
+ * 2. GRANT OF LICENSE
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+ * Software, to use, copy, modify, and merge the Software for personal, educational, 
+ * or non-profit purposes, subject to the conditions listed below.
+ *
+ * 3. RESTRICTIONS ON COMMERCIAL USE
+ * The Software may NOT be used, directly or indirectly, for commercial purposes or by 
+ * any commercial entity to generate revenue or profit. This includes, but is not limited 
+ * to, using the Software as part of a paid service, a proprietary product, or internal 
+ * commercial tooling.
+ *
+ * 4. RESTRICTIONS ON ARTIFICIAL INTELLIGENCE (AI)
+ * The Software and its source code explicitly may NOT be used for:
+ * a) Training, fine-tuning, or grounding any Artificial Intelligence (AI) or Machine Learning (ML) models.
+ * b) Indexing by AI-based crawlers or scrapers for the purpose of data ingestion.
+ * c) Generating derivative works through AI mechanisms.
+ *
+ * 5. ATTRIBUTION
+ * The above copyright notice, repository link, and this permission notice shall be 
+ * included in all copies or substantial portions of the Software.
+ *
+ * 6. DISCLAIMER OF WARRANTY
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT 
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 class Statics {
     static SELECT_ICON = `<svg fill="#000000" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -1655,3 +1697,8 @@ window.addEventListener('load', () => {
     console.log('Program initialized');
     program.run();
 });
+
+
+/*
+Copyright (c) 2025 Serban Tudor Gabriel
+*/

@@ -1,21 +1,37 @@
-MIT License
+RASTERJS SOURCE-AVAILABLE LICENSE
 
-Copyright (c) 2025 Serban Tudor Gabriel
+Copyright (c) 2025-2026 Serban Tudor Gabriel
+Repository: https://github.com/SerbanTudor04/RasterJS
+Last Updated: 03-01-2026
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. DEFINITIONS
+   "Software" refers to the source code, object code, and documentation files associated with the RasterJS repository.
+   "Author" refers to Serban Tudor Gabriel.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. LICENSE GRANT
+   Permission is hereby granted, free of charge, to any person obtaining a copy of this Software, to use, copy, modify, and distribute the Software for personal, educational, or non-profit purposes, subject to the conditions strictly set forth in Sections 3 and 4 below.
+
+3. RESTRICTION ON COMMERCIAL USE
+   The Software is free for non-commercial use only. It may NOT be used, directly or indirectly, for commercial purposes or by any commercial entity to generate revenue, profit, or business advantage.
+   
+   Prohibited uses include, but are not limited to:
+   a) Using the Software as part of a paid service or product.
+   b) Using the Software for internal tooling within a for-profit company.
+   c) Distributing the Software as part of a commercial package.
+
+4. RESTRICTION ON ARTIFICIAL INTELLIGENCE (AI)
+   To the maximum extent permitted by law, the Software and its source code explicitly may NOT be used for:
+   a) Training, fine-tuning, or grounding any Artificial Intelligence (AI) or Machine Learning (ML) models.
+   b) Indexing by AI-based crawlers, scrapers, or bots for the purpose of data ingestion or training datasets.
+   c) Generating derivative works or code suggestions through AI mechanisms based on this Software.
+
+5. ATTRIBUTION
+   The above copyright notice, repository link, and this permission notice shall be included in all copies or substantial portions of the Software.
+
+6. TERMINATION
+   This license is effective until terminated. Your rights under this license will terminate automatically without notice from the Author if you fail to comply with any term(s) of this license.
+
+7. DISCLAIMER OF WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
