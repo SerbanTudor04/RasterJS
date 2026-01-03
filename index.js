@@ -1700,5 +1700,5 @@ window.addEventListener('load', () => {
 
 
 /*
-Copyright (c) 2025 Serban Tudor Gabriel
+Copyright (c) 2025-2026 Serban Tudor Gabriel
 */
