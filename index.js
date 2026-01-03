@@ -41,36 +41,14 @@
  */
 
 class Statics {
-    static SELECT_ICON = `<svg fill="#000000" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
-    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-    <g id="SVGRepo_iconCarrier"> <title>move</title> <path d="M7 23.375l3.625 3.625c0.156 0.156 0.344 0.25 0.563 0.219 0.25 0 0.469-0.063 0.625-0.219l3.594-3.625c0.5-0.5 0.344-0.875-0.375-0.875h-2.438v-5.125h5.063v2.5c0 0.719 0.438 0.844 0.938 0.344l3.594-3.594c0.156-0.156 0.219-0.344 0.219-0.594 0.031-0.219-0.063-0.438-0.219-0.625l-3.594-3.563c-0.5-0.5-0.938-0.375-0.906 0.344v2.438h-5.094v-5.063h2.438c0.719 0 0.875-0.406 0.375-0.906l-3.594-3.563c-0.313-0.313-0.875-0.344-1.188 0l-3.625 3.563c-0.5 0.5-0.344 0.906 0.375 0.906h2.438v5.031h-5.031v-2.406c0-0.719-0.438-0.844-0.938-0.344l-3.594 3.563c-0.156 0.156-0.219 0.375-0.25 0.625 0 0.25 0.094 0.438 0.25 0.594l3.594 3.594c0.5 0.5 0.906 0.375 0.906-0.344v-2.469h5.063v5.094h-2.438c-0.719 0-0.875 0.375-0.375 0.875z"></path> </g>
-    </svg>`
-    
-    static RECT_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-    <path d="M4 4h16v16H4z"/>
-    </svg>`;
-
-    static LINE_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-    <path d="M5 19L19 5"/>
-    </svg>`;
-
-    static TRIANGLE_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-    <path d="M12 2L2 22h20z"/>
-    </svg>`;
-
-    static PEN_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-    <path d="M20.71 5.63l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41zM3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25z"/>
-    </svg>`
-
-    static CARET_DOWN_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>`;
-    static ELLIPSE_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-    <ellipse cx="12" cy="12" rx="10" ry="6"/>
-    </svg>`;
-
-    static CIRCLE_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-    <circle cx="12" cy="12" r="9"/>
-    </svg>`;
+    static SELECT_ICON = 'media/select.svg';
+    static RECT_ICON = 'media/rect.svg';
+    static LINE_ICON = 'media/line.svg';
+    static TRIANGLE_ICON = 'media/triangle.svg';
+    static PEN_ICON = 'media/pen.svg';
+    static CARET_DOWN_ICON = 'media/caret-down.svg';
+    static ELLIPSE_ICON = 'media/ellipse.svg';
+    static CIRCLE_ICON = 'media/circle.svg';
 }
 
 class Drawable {
@@ -986,10 +964,11 @@ class Ribbon {
 
         for (let tool of drawTools) {
             let item = document.createElement('button');
-            item.innerHTML = `${tool.icon} <span>${tool.title}</span>`;
+            item.innerHTML = `<img src="${tool.icon}" class="icon-img" /> <span>${tool.title}</span>`;
+            
             item.addEventListener('click', () => {
                 this.currentDrawTool = tool.name;
-                this.mainDrawButton.innerHTML = tool.icon;
+                this.mainDrawButton.innerHTML = `<img src="${tool.icon}" class="icon-img" />`;
                 this.mainDrawButton.title = tool.title;
                 this.setActiveTool(tool.name);
                 this.drawDropdownContent.classList.remove('show');
@@ -1006,10 +985,10 @@ class Ribbon {
         parentGroup.appendChild(drawGroup);
     }
 
-    _createButton(id, title, svgIconHtml) {
+_createButton(id, title, iconPath) {
         let button = document.createElement('button');
         button.id = id;
-        button.innerHTML = svgIconHtml;
+        button.innerHTML = `<img src="${iconPath}" class="icon-img" alt="${title}" />`;
         button.title = title;
         button.classList.add('tool-button');
         return button;
