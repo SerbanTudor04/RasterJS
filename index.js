@@ -74,6 +74,7 @@ class HandleDrawable extends Drawable{
         this.width=0;
         this.height=0;
         this.color='black';
+        this.handleSize=8;
     }
 
     draw(ctx){
